@@ -1,0 +1,16 @@
+# Python dependencies for CENG7822 RL Project
+
+# Core RL dependencies
+gymnasium>=0.29.0
+numpy>=1.24.0
+stable-baselines3>=2.0.0
+
+# Game rendering (Arcade instead of pygame)
+arcade>=2.6.17
+
+# Monitoring and logging
+tensorboard>=2.13.0
+matplotlib>=3.7.0
+
+# Optional: For video recording
+# opencv-python>=4.8.0
