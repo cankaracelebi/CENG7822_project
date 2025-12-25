@@ -64,6 +64,8 @@ class ShooterEnv(gym.Env):
         damage_on_contact: float = 0.2,  # fraction of health per hit
         prize_ttl_range: Tuple[float, float] = (4.0, 8.0),
         enable_prize_ttl: bool = True,
+        # Reward shaping parameters (configurable for experiments)
+        reward_config: Optional[Dict[str, float]] = None,
     ):
         super().__init__()
 
@@ -91,6 +93,17 @@ class ShooterEnv(gym.Env):
         self.damage_on_contact = damage_on_contact
         self.prize_ttl_range = prize_ttl_range
         self.enable_prize_ttl = enable_prize_ttl
+
+        # Reward shaping config (allows different reward strategies)
+        self.reward_config = reward_config or {
+            "R_PRIZE": 1.0,
+            "R_HIT": 0.3,
+            "R_KILL": 1.0,
+            "R_DAMAGE": 1.0,
+            "R_SHOT": 0.02,
+            "R_TIME": 0.001,
+            "R_DEATH": 5.0,
+        }
 
         # Internal timers
         self._enemy_spawn_timer = 0.0
@@ -464,19 +477,20 @@ class ShooterEnv(gym.Env):
         return obs
 
     def _compute_reward(self) -> float:
-        # lets work on some initial reward shaping then we wil lfocus on something wiht more detail
-        R_PRIZE = 1.0
-        R_HIT = 0.3
-        R_KILL = 1.0
-        R_DAMAGE = 1.0  # multiplied by damage fraction
-        R_SHOT = 0.02
-        R_TIME = 0.001
-        R_DEATH = 5.0
+        # Use configurable reward shaping parameters
+        rc = self.reward_config
+        R_PRIZE = rc.get("R_PRIZE", 1.0)
+        R_HIT = rc.get("R_HIT", 0.3)
+        R_KILL = rc.get("R_KILL", 1.0)
+        R_DAMAGE = rc.get("R_DAMAGE", 1.0)
+        R_SHOT = rc.get("R_SHOT", 0.02)
+        R_TIME = rc.get("R_TIME", 0.001)
+        R_DEATH = rc.get("R_DEATH", 5.0)
 
         reward = 0.0
 
-        reward += R_PRIZE * self._events.get("prize", 0.0) #obtaining prizes is important 
-        reward += R_HIT * self._events.get("hit", 0.0) #
+        reward += R_PRIZE * self._events.get("prize", 0.0)
+        reward += R_HIT * self._events.get("hit", 0.0)
         reward += R_KILL * self._events.get("kill", 0.0)
 
         reward -= R_DAMAGE * self._events.get("damage", 0.0)
@@ -520,14 +534,53 @@ class ShooterEnv(gym.Env):
             return self._render_rgb_array()
 
     def _render_rgb_array(self):
-        """Render to RGB array using Arcade's offscreen rendering"""
-        # Create an offscreen buffer
-        if not hasattr(self, '_offscreen_buffer'):
-            self._offscreen_buffer = arcade.create_offscreen()
+        """Render game state to RGB numpy array for world model training"""
+        import cv2
         
-        # TODO: Implement offscreen rendering for rgb_array mode
-        # For now, return a placeholder
-        return np.zeros((self.height, self.width, 3), dtype=np.uint8)
+        # Create a blank canvas
+        frame = np.zeros((self.height, self.width, 3), dtype=np.uint8)
+        
+        # Background - dark gray
+        frame[:] = (20, 20, 30)
+        
+        # Draw prizes as green circles
+        for prize in self.prizes:
+            cx, cy = int(prize.x), int(self.height - prize.y)  # Flip y for image coords
+            cv2.circle(frame, (cx, cy), 12, (0, 200, 0), -1)
+            cv2.circle(frame, (cx, cy), 12, (0, 255, 0), 2)
+        
+        # Draw enemies as red circles
+        for enemy in self.enemies:
+            cx, cy = int(enemy.x), int(self.height - enemy.y)
+            cv2.circle(frame, (cx, cy), 15, (0, 0, 180), -1)
+            cv2.circle(frame, (cx, cy), 15, (0, 0, 255), 2)
+        
+        # Draw bullets as yellow circles
+        for bullet in self.bullets:
+            cx, cy = int(bullet.x), int(self.height - bullet.y)
+            cv2.circle(frame, (cx, cy), 4, (0, 200, 255), -1)
+        
+        # Draw agent as blue circle with health indicator
+        ax, ay = int(self.agent.x), int(self.height - self.agent.y)
+        health_color = (
+            int(255 * (1 - self.agent.health)),  # More red when damaged
+            int(255 * self.agent.health),  # More green when healthy
+            200
+        )
+        cv2.circle(frame, (ax, ay), 18, health_color, -1)
+        cv2.circle(frame, (ax, ay), 18, (255, 255, 255), 2)
+        
+        # Draw aim direction indicator
+        if hasattr(self, '_last_direction'):
+            dir_angles = [0, 45, 90, 135, 180, 225, 270, 315]
+            if self._last_direction < len(dir_angles):
+                angle = np.radians(dir_angles[self._last_direction])
+                dx, dy = int(25 * np.cos(angle)), int(25 * np.sin(angle))
+                cv2.line(frame, (ax, ay), (ax + dx, ay - dy), (255, 255, 255), 2)
+        
+        # Convert BGR to RGB
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        return frame
 
     def close(self):
         if self._window is not None:

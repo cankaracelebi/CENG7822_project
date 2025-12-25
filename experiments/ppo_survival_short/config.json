@@ -1,0 +1,18 @@
+{
+  "name": "ppo_survival_short",
+  "algorithm": "ppo",
+  "timesteps": 50000,
+  "reward_config": "survival",
+  "reward_params": {
+    "name": "survival",
+    "description": "Prioritize survival - higher damage/death penalties, lower combat rewards",
+    "R_PRIZE": 0.5,
+    "R_HIT": 0.1,
+    "R_KILL": 0.5,
+    "R_DAMAGE": 3.0,
+    "R_SHOT": 0.05,
+    "R_TIME": 0.0005,
+    "R_DEATH": 10.0
+  },
+  "timestamp": "2025-12-24T13:51:29.029224"
+}

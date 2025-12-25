@@ -6,11 +6,38 @@ import argparse
 import numpy as np
 from typing import Optional
 
-from stable_baselines3 import PPO, DQN
+import gymnasium as gym
+from gymnasium import spaces
+
+from stable_baselines3 import PPO, DQN, SAC
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
 from game.g2D import ShooterEnv
 from rl.configs.shooter_config import ENV_CONFIG
+
+
+class MultiDiscreteToBoxWrapper(gym.ActionWrapper):
+    """Wrapper to convert MultiDiscrete action space to Box for SAC evaluation."""
+    
+    def __init__(self, env):
+        super().__init__(env)
+        self.orig_action_space = env.action_space
+        self.n_actions = len(env.action_space.nvec)
+        self.action_space = spaces.Box(
+            low=-1.0,
+            high=1.0,
+            shape=(self.n_actions,),
+            dtype=np.float32
+        )
+        self._nvec = env.action_space.nvec
+        
+    def action(self, action):
+        discrete_action = []
+        for i, (a, n) in enumerate(zip(action, self._nvec)):
+            scaled = (a + 1) / 2
+            idx = int(np.clip(scaled * n, 0, n - 1))
+            discrete_action.append(idx)
+        return np.array(discrete_action, dtype=np.int64)
 
 
 def evaluate_model(
@@ -26,7 +53,7 @@ def evaluate_model(
     
     Args:
         model_path: Path to the saved model
-        algo: Algorithm used ('ppo' or 'dqn')
+        algo: Algorithm used ('ppo', 'dqn', or 'sac')
         n_episodes: Number of episodes to evaluate
         render: Whether to render the environment
         seed: Random seed for evaluation
@@ -38,12 +65,18 @@ def evaluate_model(
         model = PPO.load(model_path)
     elif algo == "dqn":
         model = DQN.load(model_path)
+    elif algo == "sac":
+        model = SAC.load(model_path)
     else:
         raise ValueError(f"Unknown algorithm: {algo}")
     
     # Create environment
     render_mode = "human" if render else None
     env = ShooterEnv(render_mode=render_mode, **ENV_CONFIG)
+    
+    # Wrap for SAC if needed
+    if algo == "sac":
+        env = MultiDiscreteToBoxWrapper(env)
     
     # Wrap in DummyVecEnv for compatibility
     env = DummyVecEnv([lambda: env])
@@ -174,7 +207,7 @@ def main():
         "--algo",
         type=str,
         default="ppo",
-        choices=["ppo", "dqn"],
+        choices=["ppo", "dqn", "sac"],
         help="Algorithm used to train the model (default: ppo)",
     )
     parser.add_argument(

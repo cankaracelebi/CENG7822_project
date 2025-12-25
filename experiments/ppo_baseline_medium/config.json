@@ -1,0 +1,18 @@
+{
+  "name": "ppo_baseline_medium",
+  "algorithm": "ppo",
+  "timesteps": 500000,
+  "reward_config": "baseline",
+  "reward_params": {
+    "name": "baseline",
+    "description": "Original balanced reward shaping",
+    "R_PRIZE": 1.0,
+    "R_HIT": 0.3,
+    "R_KILL": 1.0,
+    "R_DAMAGE": 1.0,
+    "R_SHOT": 0.02,
+    "R_TIME": 0.001,
+    "R_DEATH": 5.0
+  },
+  "timestamp": "2025-12-24T13:25:36.062838"
+}

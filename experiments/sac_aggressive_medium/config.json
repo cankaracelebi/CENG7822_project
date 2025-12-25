@@ -1,0 +1,18 @@
+{
+  "name": "sac_aggressive_medium",
+  "algorithm": "sac",
+  "timesteps": 500000,
+  "reward_config": "aggressive",
+  "reward_params": {
+    "name": "aggressive",
+    "description": "Prioritize combat and prizes - higher rewards, lower penalties",
+    "R_PRIZE": 2.0,
+    "R_HIT": 0.5,
+    "R_KILL": 2.0,
+    "R_DAMAGE": 0.5,
+    "R_SHOT": 0.01,
+    "R_TIME": 0.002,
+    "R_DEATH": 3.0
+  },
+  "timestamp": "2025-12-25T07:28:37.944056"
+}

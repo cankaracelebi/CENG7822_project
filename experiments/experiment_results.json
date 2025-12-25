@@ -1,0 +1,114 @@
+{
+  "total_experiments": 9,
+  "completed": "2025-12-24T14:45:31.443947",
+  "results": [
+    {
+      "name": "ppo_baseline_short",
+      "completed": true,
+      "summary": {
+        "mean_reward": -4.410190298507463,
+        "std_reward": 2.007335957587145,
+        "mean_length": 195.9365671641791,
+        "total_episodes": 268,
+        "mean_prizes": 0.0,
+        "mean_kills": 0.0
+      }
+    },
+    {
+      "name": "ppo_baseline_medium",
+      "completed": true,
+      "summary": {
+        "mean_reward": -1.2810320163487738,
+        "std_reward": 5.375094662463755,
+        "mean_length": 342.4625340599455,
+        "total_episodes": 1468,
+        "mean_prizes": 0.0,
+        "mean_kills": 0.0
+      }
+    },
+    {
+      "name": "ppo_baseline_long",
+      "completed": true,
+      "summary": {
+        "mean_reward": 4.344792005420054,
+        "std_reward": 11.856604965033062,
+        "mean_length": 541.7120596205962,
+        "total_episodes": 2952,
+        "mean_prizes": 0.0,
+        "mean_kills": 0.0
+      }
+    },
+    {
+      "name": "ppo_survival_short",
+      "completed": true,
+      "summary": {
+        "mean_reward": -13.89580443548387,
+        "std_reward": 0.6936090274238613,
+        "mean_length": 212.9798387096774,
+        "total_episodes": 248,
+        "mean_prizes": 0.0,
+        "mean_kills": 0.0
+      }
+    },
+    {
+      "name": "ppo_survival_medium",
+      "completed": true,
+      "summary": {
+        "mean_reward": -13.621477091633464,
+        "std_reward": 1.0496586759335582,
+        "mean_length": 333.65803452855243,
+        "total_episodes": 1506,
+        "mean_prizes": 0.0,
+        "mean_kills": 0.0
+      }
+    },
+    {
+      "name": "ppo_survival_long",
+      "completed": true,
+      "summary": {
+        "mean_reward": -12.442973798449614,
+        "std_reward": 3.379399144499006,
+        "mean_length": 495.49798449612405,
+        "total_episodes": 3225,
+        "mean_prizes": 0.0,
+        "mean_kills": 0.0
+      }
+    },
+    {
+      "name": "ppo_aggressive_short",
+      "completed": true,
+      "summary": {
+        "mean_reward": 0.6610992366412214,
+        "std_reward": 4.637249594243595,
+        "mean_length": 200.84351145038167,
+        "total_episodes": 262,
+        "mean_prizes": 0.0,
+        "mean_kills": 0.0
+      }
+    },
+    {
+      "name": "ppo_aggressive_medium",
+      "completed": true,
+      "summary": {
+        "mean_reward": 7.089646905537459,
+        "std_reward": 10.762138440392677,
+        "mean_length": 327.5771986970684,
+        "total_episodes": 1535,
+        "mean_prizes": 0.0,
+        "mean_kills": 0.0
+      }
+    },
+    {
+      "name": "ppo_aggressive_long",
+      "completed": true,
+      "summary": {
+        "mean_reward": 18.32019184339315,
+        "std_reward": 23.353118404014214,
+        "mean_length": 521.3070146818924,
+        "total_episodes": 3065,
+        "mean_prizes": 0.0,
+        "mean_kills": 0.0
+      }
+    }
+  ]
+}
