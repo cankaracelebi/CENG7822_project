@@ -36,8 +36,11 @@ class LatentPolicy(nn.Module):
 
 class WorldModelAgent:
     """
-    Agent that uses VAE + Dynamics for decision making.
+    Agent that uses VAE + MDN-RNN for decision making.
     Supports MPC planning or learned latent policy.
+    
+    Now uses MDN-RNN (LSTM + Mixture Density Network) for temporal dynamics
+    as per the original World Models paper (Ha & Schmidhuber 2018).
     """
     
     def __init__(
@@ -49,6 +52,7 @@ class WorldModelAgent:
         n_candidates: int = 100,
         use_mpc: bool = True,
         device: str = "cpu",
+        temperature: float = 1.0,  # For stochastic sampling from MDN
     ):
         self.vae = vae.to(device)
         self.dynamics = dynamics.to(device)
@@ -57,6 +61,10 @@ class WorldModelAgent:
         self.n_candidates = n_candidates
         self.use_mpc = use_mpc
         self.device = device
+        self.temperature = temperature
+        
+        # LSTM hidden state for MDN-RNN
+        self.hidden = None
         
         # For MPC: get action dimensions
         if hasattr(action_space, 'nvec'):
@@ -107,10 +115,14 @@ class WorldModelAgent:
             remaining //= n
         return np.array(list(reversed(indices)), dtype=np.int64)
     
+    def reset_hidden(self):
+        """Reset LSTM hidden state (call at start of episode)"""
+        self.hidden = None
+    
     def mpc_planning(self, z: torch.Tensor) -> int:
         """
-        Model Predictive Control: sample random action sequences,
-        roll out in imagination, pick best.
+        Model Predictive Control with MDN-RNN: sample random action sequences,
+        roll out in imagination (stochastically), pick best.
         """
         self.dynamics.eval()
         
@@ -130,14 +142,19 @@ class WorldModelAgent:
                 action_onehot = F.one_hot(actions, self.n_actions).float()
                 action_onehot = action_onehot.unsqueeze(0)  # (1, T, action_dim)
                 
-                # Rollout
-                z_seq, rewards, dones = self.dynamics.rollout(z, action_onehot)
+                # Rollout with MDN-RNN (uses current hidden state)
+                z_seq, rewards, dones, _ = self.dynamics.rollout(
+                    z, action_onehot, 
+                    hidden=self.hidden,
+                    temperature=self.temperature,
+                    deterministic=False
+                )
                 
                 # Sum predicted rewards (discounted)
                 if rewards is not None:
                     gamma = 0.99
                     discounts = torch.tensor([gamma ** t for t in range(self.planning_horizon)], device=self.device)
-                    total_reward = (rewards.squeeze() * discounts).sum().item()
+                    total_reward = (rewards.squeeze(-1).squeeze(0) * discounts).sum().item()
                 else:
                     # If no reward prediction, use negative latent distance as proxy
                     total_reward = -torch.norm(z_seq[:, -1] - z_seq[:, 0]).item()
@@ -149,13 +166,21 @@ class WorldModelAgent:
         return best_action
     
     def get_action(self, frame: np.ndarray, deterministic: bool = True) -> np.ndarray:
-        """Get action given raw frame observation"""
+        """Get action given raw frame observation, updates internal hidden state"""
         z = self.encode_frame(frame)
         
         if self.use_mpc:
             action_idx = self.mpc_planning(z)
         else:
             action_idx = self.policy.get_action(z, deterministic)
+        
+        # Update hidden state with the action we're about to take
+        with torch.no_grad():
+            action_onehot = F.one_hot(
+                torch.tensor([action_idx], device=self.device), 
+                self.n_actions
+            ).float()
+            _, _, _, _, _, self.hidden = self.dynamics(z, action_onehot, self.hidden)
         
         return self.decode_action(action_idx)
     

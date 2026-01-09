@@ -94,6 +94,50 @@ class FrameDataCollector:
         
         return total_frames
     
+    def collect_with_policy(
+        self,
+        env,
+        policy,
+        n_episodes: int = 100,
+        max_steps_per_episode: int = 1000,
+        verbose: bool = True,
+    ) -> int:
+        """Collect frames using a trained policy (e.g., PPO model from SB3)"""
+        total_frames = 0
+        total_reward = 0
+        
+        for ep in range(n_episodes):
+            obs, info = env.reset()
+            frame = env.render()
+            
+            for step in range(max_steps_per_episode):
+                if len(self.frames) >= self.max_frames:
+                    break
+                
+                # Use trained policy
+                action, _ = policy.predict(obs, deterministic=False)
+                next_obs, reward, terminated, truncated, info = env.step(action)
+                done = terminated or truncated
+                
+                self.add_transition(frame, action, reward, done)
+                total_frames += 1
+                total_reward += reward
+                
+                if done:
+                    break
+                
+                obs = next_obs
+                frame = env.render()
+            
+            if verbose and (ep + 1) % 10 == 0:
+                avg_r = total_reward / (ep + 1)
+                print(f"Episode {ep+1}/{n_episodes}, Total frames: {len(self.frames)}, Avg Reward: {avg_r:.2f}")
+            
+            if len(self.frames) >= self.max_frames:
+                break
+        
+        return total_frames
+    
     def save(self, filename: str = "collected_data.npz"):
         """Save collected data to disk"""
         path = os.path.join(self.save_dir, filename)

@@ -12,5 +12,16 @@ arcade>=2.6.17
 tensorboard>=2.13.0
 matplotlib>=3.7.0
 
-# Optional: For video recording
-# opencv-python>=4.8.0
+# Video recording and progress
+moviepy>=2.0.0
+rich>=13.0.0
+tqdm>=4.65.0
+
+# Deep learning
+torch>=2.0.0
+
+# Image processing
+opencv-python>=4.8.0
+
+# CMA-ES for world model controller training
+cma>=3.0.0
