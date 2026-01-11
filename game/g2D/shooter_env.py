@@ -1,7 +1,7 @@
 """
 ShooterEnv - a compact 2D top-down shooter RL environment
 ---------------------------------------------------------
-- Arcade for simulation/rendering (migrated from Pygame)
+- Arcade for simulation/rendering
 - Gymnasium API
 - 1 RL agent that moves + shoots (with cooldown)
 - Random prizes for reward
@@ -14,8 +14,6 @@ This is designed to be:
 - Easy to explain in a term project report
 - Easy to extend (enemy types, obstacles, enemy projectiles, image obs)
 
-Install:
-    pip install gymnasium arcade numpy
 
 Quick test:
     python -m game.2D.shooter_env

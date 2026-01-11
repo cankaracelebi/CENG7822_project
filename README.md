@@ -7,9 +7,9 @@ This project implements and compares reinforcement learning approaches for train
 ### Installation
 
 ```bash
-# Create conda environment
-conda create -n rlan python=3.10
-conda activate rlan
+# It is highly recommended to use a virtual environment a sample command is given below
+conda create -n <your_env_name> python=3.10
+conda activate <your_env_name>
 
 # Install dependencies
 pip install -r requirements.txt
@@ -18,7 +18,8 @@ pip install -r requirements.txt
 ### Run the Game (Human Play)
 
 ```bash
-cd game && python game.py
+# Arcade-based 2D shooter environment
+python -m game.g2D.shooter_env
 ```
 
 ## Training Agents
@@ -39,9 +40,13 @@ python -m rl.evaluate --model-path trained_models/ppo/ppo_aggressive.zip --n-epi
 ### Pre-trained Models
 We provide the trained models in the `trained_models/` directory:
 - `trained_models/ppo/ppo_aggressive.zip`: **Best Agent (+38.74)** (PPO with aggressive rewards)
-- `trained_models/world_model/dyna_agent.zip`: Best World Model agent (-4.87)
+- `trained_models/world_model/dyna_agent.zip`: Most Stable World Model agent (-4.87)
 - `trained_models/world_model/vae.pt`: Pre-trained VAE
 - `trained_models/world_model/mdn_rnn.pt`: Pre-trained MDN-RNN
+
+### Experiment Models:
+All models trained with given 27 configurations are savedd under `experiment_models/` directory.
+you can check their configurations and their model checkpoints. trained_models/ directory is created for ease of use.
 
 ### World Model Approaches
 
@@ -73,7 +78,7 @@ python -m world_model.train_world_model_ppo \
 python -m world_model.train_world_model_ppo --eval-only --model-path world_model_hybrid/ppo_hybrid.zip
 ```
 
-**3. Dyna-Style Training **
+**3. Dyna-Style Training (Most Stable)**
 ```bash
 # Train interleaving real and dream experiences
 python -m world_model.train_dyna \
@@ -110,10 +115,10 @@ python -m world_model.verify_world_model --model-dir ./trained_models/world_mode
 │   ├── train.py            # Training script
 │   └── evaluate.py         # Evaluation with video recording
 ├── world_model/             # World Models implementation
-│   ├── vae.py              # Variational Autoencoder (BCE loss)
+│   ├── vae.py              # Variational Autoencoder 
 │   ├── mdn_rnn.py          # Mixture Density Network RNN
 │   ├── train_world_model_ppo.py  # Full training pipeline
-│   ├── train_dyna.py       # Dyna-style training (recommended)
+│   ├── train_dyna.py       # Dyna-style training 
 │   └── verify_world_model.py
 ├── report/                  # LaTeX report
 ├── presentation/            # Beamer presentation

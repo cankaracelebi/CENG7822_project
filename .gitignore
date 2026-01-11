@@ -27,9 +27,10 @@ env/
 .venv
 
 # RL Training Artifacts
-models/
+# models/
 logs/
 tensorboard_logs/
+**/tb/
 *.pkl
 
 # Trained model checkpoints (large files)
@@ -38,7 +39,12 @@ world_model_agent_long/
 world_model_agent_real/
 world_model_agent_real_v2/
 world_model_checkpoints/
-experiments/
+# experiments/
+
+# Track trained models
+!trained_models/
+!trained_models/**/*.zip
+!trained_models/**/*.pt
 
 # Backup files
 *.backup

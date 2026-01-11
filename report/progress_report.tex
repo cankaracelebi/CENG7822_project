@@ -27,13 +27,11 @@
 
 \section{Introduction}
 
-This report presents our work on training reinforcement learning agents for a custom 2D top-down shooter game environment. The core objective is to develop autonomous agents capable of navigating a dynamic game world, collecting prizes for positive rewards, avoiding or eliminating enemies, and surviving for extended periods. We investigate multiple model-free reinforcement learning algorithms including Deep Q-Network (DQN), Proximal Policy Optimization (PPO), and Soft Actor-Critic (SAC), evaluating their performance across different reward shaping strategies and training durations. Additionally, we have implemented a world model approach using Variational Autoencoders (VAE) and MDN-RNN for latent space representation learning and imagination-based planning.
-
-Our experimental design encompasses 27 distinct configurations, systematically varying the algorithm choice, reward shaping parameters, and total training timesteps. This comprehensive experimental matrix allows us to draw meaningful conclusions about the relative effectiveness of different approaches and the importance of reward engineering in shaping agent behavior. The results indicate that reward shaping plays a critical role in determining final performance, with aggressive reward configurations that emphasize positive feedback consistently outperforming more conservative alternatives.
+This report presents my work on training reinforcement learning agents for a custom 2D top-down shooter game environment. The core objective is to develop autonomous agents capable of navigating a dynamic game world, collecting prizes for positive rewards, avoiding or eliminating enemies, and surviving for extended periods. We investigate multiple model-free reinforcement learning algorithms including Deep Q-Network (DQN), Proximal Policy Optimization (PPO), and Soft Actor-Critic (SAC), evaluating their performance across different reward shaping strategies and training durations. Additionally, we have implemented a world model approach using Variational Autoencoders (VAE) and MDN-RNN for latent space representation learning and imagination-based planning. My experimental design encompasses 27 distinct configurations, systematically varying the algorithm choice, reward shaping parameters, and total training timesteps. This comprehensive training regime allows us to draw meaningful conclusions about the relative effectiveness of different approaches and the importance of reward engineering in shaping agent behavior. The results indicate that reward shaping plays a critical role in determining final performance with aggressive reward configurations that emphasize positive feedback consistently outperforming its alternatives.
 
 \section{Literature Survey}
 
-We survey prior work in deep reinforcement learning (RL) across several themes relevant to our project: RL in shooting game environments (2D and 3D), reward shaping for improved learning, safe exploration perspectives, and generalization to new scenarios. Throughout, we position our custom 2D top-down shooter as a course-scale, analyzable environment that inherits the core challenges of aim, move, and survive while enabling systematic ablations.
+We survey prior work in deep reinforcement learning (RL) across several themes relevant to our project: RL in shooting game environments (2D and 3D), reward shaping for improved learning, safe exploration perspectives and generalization to new scenarios. Throughout, we position our custom 2D top-down shooter as a course-scale, analyzable environment that inherits the core challenges of aim, move and survive while enabling systematic ablations.
 
 \subsection{Deep RL in Arcade Games}
 
@@ -81,7 +79,7 @@ The Dreamer algorithm family \cite{dreamerv1, dreamerv2, dreamerv3} advanced wor
 
 \subsubsection{COOM: A Benchmark for Continual Reinforcement Learning}
 
-COOM (Continual DOOM) \cite{coom} represents an important recent benchmark for evaluating reinforcement learning agents in complex 3D environments. Presented at NeurIPS 2023 by Tomilin et al., COOM specifically targets \textit{continual reinforcement learning}---the ability of agents to learn new tasks sequentially while retaining knowledge of previously learned ones.
+COOM (Continual DOOM) \cite{coom} represents an important recent benchmark for evaluating reinforcement learning agents in complex 3D environments. Presented at NeurIPS 2023 by Tomilin et al., COOM specifically targets \textit{continual reinforcement learning}--the ability of agents to learn new tasks sequentially while retaining knowledge of previously learned ones.
 
 \textbf{Benchmark Design Philosophy:} Unlike traditional RL benchmarks that evaluate single-task performance, COOM assesses three crucial aspects of continual learning:
 \begin{enumerate}
@@ -106,8 +104,8 @@ Each scenario offers default and hard difficulty variants, modifying agent speed
 
 \textbf{Task Sequence Types:} COOM formulates continual learning through two distinct sequence types:
 \begin{itemize}
-    \item \textbf{Cross-Domain (CD)}: Same objective across visual variants---the agent trains on modified versions of Run and Gun with different textures, enemy types, and obstacles
-    \item \textbf{Cross-Objective (CO)}: Different scenarios with novel objectives---the goal changes from elimination (Run and Gun) to evasion (Hide and Seek) to navigation (Floor is Lava)
+    \item \textbf{Cross-Domain (CD)}: Same objective across visual variants--the agent trains on modified versions of Run and Gun with different textures, enemy types, and obstacles
+    \item \textbf{Cross-Objective (CO)}: Different scenarios with novel objectives--the goal changes from elimination (Run and Gun) to evasion (Hide and Seek) to navigation (Floor is Lava)
 \end{itemize}
 
 Sequences come in 4-task, 8-task, and 16-task variants for varying evaluation complexity.
@@ -154,14 +152,14 @@ ClonEx-SAC & \textbf{0.61} & \textbf{0.18} & \textbf{0.05} \\
 Key findings from baseline evaluation:
 \begin{itemize}
     \item Even the best method (ClonEx-SAC) shows 18\% forgetting
-    \item Forward transfer is often \textbf{negative}---prior tasks can hurt new learning
+    \item Forward transfer is often \textbf{negative}--prior tasks can hurt new learning
     \item Cross-objective sequences are significantly harder than cross-domain variants
     \item Visual complexity alone does not fully explain performance degradation
 \end{itemize}
 
 \textbf{Relevance to Our Work:} COOM's design principles directly inform our shooter environment and world model implementation:
 \begin{enumerate}
-    \item \textbf{Multi-objective Nature}: Our environment requires agents to simultaneously optimize survival, collection, and combat---similar to how COOM scenarios test diverse skills.
+    \item \textbf{Multi-objective Nature}: Our environment requires agents to simultaneously optimize survival, collection, and combat--similar to how COOM scenarios test diverse skills.
     
     \item \textbf{World Models for Continual Learning}: The benchmark demonstrates that continual learning in shooter-like environments remains an open challenge. World model approaches might enable more robust skill retention through learned dynamics that transfer across tasks.
     
@@ -289,7 +287,7 @@ Table~\ref{tab:results} presents the complete numerical results for all experime
 
 \begin{table}[H]
 \centering
-\caption{Final Performance Across All Configurations (Mean $\pm$ Std over final 10\% of episodes). High standard deviations reflect the stochastic nature of individual episodes---enemy spawns, prize locations, and combat outcomes vary significantly between runs.}
+\caption{Final Performance Across All Configurations (Mean $\pm$ Std over final 10\% of episodes). High standard deviations reflect the stochastic nature of individual episodes--enemy spawns, prize locations, and combat outcomes vary significantly between runs.}
 \label{tab:results}
 \begin{tabular}{llcrc}
 \toprule
@@ -319,9 +317,9 @@ SAC & Survival & Medium & 2,229 & $-13.54 \pm 0.94$ \\
 \end{tabular}
 \end{table}
 
-\textbf{On High Standard Deviations:} The relatively high standard deviations observed (e.g., $\pm 30.61$ for PPO aggressive/long) deserve explanation. These reflect the inherent stochasticity of the game environment rather than training instability. Each episode involves random enemy spawns, prize locations, and combat outcomes. An agent might collect 5 prizes in a ``lucky'' episode or encounter difficult enemy configurations leading to early death. The aggressive reward configuration amplifies this variability because both positive rewards (+2.0 per prize) and negative events are magnified. Importantly, the \textit{mean} rewards are statistically significant---even with high variance, PPO aggressive/long ($+38.74$) clearly outperforms PPO survival/long ($-8.80$) beyond the overlap of their standard deviations.
+\textbf{On High Standard Deviations:} The relatively high standard deviations observed (e.g., $\pm 30.61$ for PPO aggressive/long) deserve explanation. These reflect the inherent stochasticity of the game environment rather than training instability. Each episode involves random enemy spawns, prize locations, and combat outcomes. An agent might collect 5 prizes in a ``lucky'' episode or encounter difficult enemy configurations leading to early death. The aggressive reward configuration amplifies this variability because both positive rewards (+2.0 per prize) and negative events are magnified. Importantly, the \textit{mean} rewards are statistically significant--even with high variance, PPO aggressive/long ($+38.74$) clearly outperforms PPO survival/long ($-8.80$) beyond the overlap of their standard deviations.
 
-\section{Ablation Study: Effect of Reward Shaping}
+\section{Ablation Study: Effect of Reward Shaping (Engineering) }
 
 Our ablation study reveals that reward shaping is the most influential factor in determining final agent performance. Figure~\ref{fig:ablation} presents a grouped bar chart comparing all algorithms across the three reward configurations at 500k timesteps.
 
@@ -348,7 +346,7 @@ Furthermore, the strong damage penalty ($-$3.0) makes any interaction with enemi
 
 \subsection{DQN Reward Decrease Phenomenon}
 
-An interesting observation from Figure~\ref{fig:dqn-curves} is DQN's reward decrease in certain scenarios, particularly with the survival configuration. This phenomenon stems from the interaction between epsilon-greedy exploration and sparse rewards. Initially, high epsilon forces exploration that occasionally yields positive rewards. As epsilon decays and the Q-network attempts to exploit learned values, it may converge to overly conservative policies that avoid all risky actions---including those necessary for positive rewards. The value-based nature of DQN makes it particularly susceptible to this failure mode when negative rewards dominate, as Q-values for exploratory actions become severely penalized.
+An interesting observation from Figure~\ref{fig:dqn-curves} is DQN's reward decrease in certain scenarios, particularly with the survival configuration. This phenomenon stems from the interaction between epsilon-greedy exploration and sparse rewards. Initially, high epsilon forces exploration that occasionally yields positive rewards. As epsilon decays and the Q-network attempts to exploit learned values, it may converge to overly conservative policies that avoid all risky actions--including those necessary for positive rewards. The value-based nature of DQN makes it particularly susceptible to this failure mode when negative rewards dominate, as Q-values for exploratory actions become severely penalized.
 
 \section{World Model Implementation}
 
@@ -388,25 +386,9 @@ Figure~\ref{fig:vae-arch} illustrates the complete VAE architecture, showing the
 \subsection{VAE Loss Function}
 \label{subsec:vae-loss}
 
-Following the original World Models paper \cite{worldmodels}, we employ Binary Cross-Entropy (BCE) for the reconstruction term, treating normalized pixel values as independent Bernoulli random variables. The decoder's sigmoid activation naturally constrains outputs to $[0,1]$, making BCE the theoretically appropriate choice over Mean Squared Error (MSE). The total loss is:
-\begin{equation}
-  \mathcal{L}_{VAE} = \mathbb{E}_{q(z|x)}[\text{BCE}(x, \hat{x})] + \beta \cdot D_{KL}(q(z|x) \| p(z))
-\end{equation}
-where $\beta=1$ weights the KL divergence term that encourages the latent distribution $q(z|x)$ to remain close to the unit Gaussian prior $p(z) = \mathcal{N}(0, I)$.
+Following the original World Models paper \cite{worldmodels}, we employ Binary Cross-Entropy (BCE) for reconstruction, treating normalized pixel values as Bernoulli random variables. BCE outperformed Mean Squared Error (MSE) significantly: MSE reconstruction metrics dropped from 0.015 to under 0.001 with BCE. MSE fails for game frames because it encourages ``safe'' blurry predictions, while BCE creates sharp gradients that enforce confident pixel classification. The total VAE loss combines reconstruction with a KL divergence term ($\beta=1$) to regularize the latent distribution toward $\mathcal{N}(0, I)$.
 
-\subsubsection{Reconstruction Loss: MSE vs BCE}
-
-Our initial VAE implementation used Mean Squared Error (MSE) as the reconstruction loss, which resulted in poor-quality reconstructions with excessive blurring and loss of fine details. Switching to Binary Cross-Entropy (BCE) dramatically improved reconstruction quality, reducing MSE from approximately 0.015 to under 0.001.
-
-\textbf{Why MSE Failed:} Mean Squared Error treats the reconstruction problem as Gaussian regression, assuming pixel errors follow a normal distribution with uniform variance. For our game frames with discrete color regions (black background, green agent, red enemies, yellow prizes), this assumption is violated. MSE penalizes small errors quadratically, leading the network to predict ``safe'' blurry averages rather than sharp boundaries. The loss landscape is smooth but poorly suited for discrete-like image content.
-
-\textbf{Why BCE Succeeds:} Binary Cross-Entropy interprets the sigmoid outputs as probabilities and the target pixels as class labels. This creates sharper gradients near 0 and 1 boundaries, encouraging the network to commit to confident predictions. For game frames dominated by distinct color regions, BCE's log-loss naturally emphasizes correct classification of pixels into foreground/background categories. The mathematical formulation:
-\begin{equation}
-  \mathcal{L}_{BCE} = -\frac{1}{N}\sum_{i=1}^{N}[x_i \log(\hat{x}_i) + (1-x_i)\log(1-\hat{x}_i)]
-\end{equation}
-provides infinite penalty as predictions approach the wrong extreme, strongly discouraging the averaging behavior that plagued MSE.
-
-Figure~\ref{fig:vae-recon} demonstrates the final reconstruction quality achieved with BCE loss, where entity positions and colors are accurately preserved.
+Figure~\ref{fig:vae-recon} demonstrates the final reconstruction quality achieved with BCE loss.
 
 
 \subsection{MDN-RNN Dynamics Model}
@@ -428,11 +410,7 @@ Figure~\ref{fig:mdn-rnn-arch} illustrates the complete MDN-RNN architecture, sho
 
 \subsection{Training Results}
 
-Data collection was completed with 50,000 frames gathered using a random policy over 250 episodes. VAE training ran for 100 epochs.
-
-\textbf{Initial Results with MSE Loss:} Our first VAE implementation used Mean Squared Error for reconstruction, which produced unacceptably poor results. Reconstructed frames appeared blurry with washed-out colors, failing to preserve sharp entity boundaries. The MSE-trained VAE converged to predicting ``safe'' averaged pixel values rather than the distinct color regions characteristic of our game (see discussion in Section~\ref{subsec:vae-loss}).
-
-\textbf{Improved Results with BCE Loss:} After switching to Binary Cross-Entropy loss, reconstruction quality improved dramatically. Figure~\ref{fig:vae-recon} shows representative results demonstrating that the BCE-trained VAE accurately captures game state including agent position (green), enemy locations (red), and prize positions (yellow). The reconstruction MSE dropped from approximately 0.015 (with MSE loss) to under 0.001 (with BCE loss)---a 15x improvement.
+We collected 50,000 frames using a random policy over 250 episodes and trained the VAE for 100 epochs with BCE loss. As discussed in Section~\ref{subsec:vae-loss}, BCE dramatically outperformed MSE, achieving reconstruction MSE below 0.001. Figure~\ref{fig:vae-recon} shows representative results.
 
 \begin{figure}[H]
 \centering
@@ -448,7 +426,7 @@ A well-structured latent space enables meaningful interpolation between game sta
 z_{\alpha} = (1 - \alpha) \cdot z_{\text{start}} + \alpha \cdot z_{\text{end}}
 \end{equation}
 
-The decoded intermediate frames show smooth semantic transitions: entities gradually shift positions rather than abruptly appearing or disappearing. This geometric meaningfulness is essential for the MDN-RNN to learn coherent dynamics---if nearby latent points represented radically different game states, transition prediction would be impossible.
+The decoded intermediate frames show smooth semantic transitions: entities gradually shift positions rather than abruptly appearing or disappearing. This geometric meaningfulness is essential for the MDN-RNN to learn coherent dynamics--if nearby latent points represented radically different game states, transition prediction would be impossible.
 
 \begin{figure}[H]
 \centering
@@ -457,66 +435,10 @@ The decoded intermediate frames show smooth semantic transitions: entities gradu
 \label{fig:vae-interp}
 \end{figure}
 
-\subsection{Comparison to DreamerV2}
-
-Our world model implementation shares the core VAE + dynamics structure with the original World Models paper but differs from DreamerV2 in several ways:
-
-\begin{table}[H]
-\centering
-\caption{Architectural Comparison between our implementation and DreamerV2. Our staged approach trades end-to-end optimization for clearer debugging and component validation.}
-\begin{tabular}{lcc}
-\toprule
-\textbf{Component} & \textbf{Our Implementation} & \textbf{DreamerV2} \\
-\midrule
-Latent Type & Gaussian (32-dim) & Categorical ($32 \times 32$) \\
-Dynamics & MDN-RNN (5 mixtures) & GRU + RSSM \\
-Controller & PPO (SB3) & Actor-Critic in latent space \\
-Training & Staged (VAE $\rightarrow$ RNN $\rightarrow$ PPO) & End-to-end \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-DreamerV2's end-to-end training and categorical representations offer advantages for complex environments, while our staged approach provides clearer debugging and component validation---appropriate for our 2D game domain.
 
 \subsection{MDN-RNN Training Challenges: Reward Prediction and Sigma Collapse}
 
-Training the MDN-RNN revealed significant challenges in predicting rewards from latent dynamics. While the model successfully learned latent transition dynamics (MSE $< 0.002$), the auxiliary reward prediction head failed almost entirely, achieving only 0.08 correlation between predicted and actual rewards.
-
-\subsubsection{The Sigma Hacking Problem}
-
-In Mixture Density Networks, each Gaussian component outputs a mean $\mu_k$ and standard deviation $\sigma_k$. The model can ``cheat'' the negative log-likelihood objective through a phenomenon known as \textit{sigma hacking} or \textit{sigma collapse}. When the model encounters difficult-to-predict samples, it can reduce loss by shrinking $\sigma$ toward zero for one component and placing $\mu$ exactly on the target:
-\begin{equation}
-  -\log p(z | \mu, \sigma) = \frac{(z-\mu)^2}{2\sigma^2} + \log\sigma + \text{const}
-\end{equation}
-As $\sigma \to 0$ with $(z-\mu) \to 0$, the loss approaches $-\infty$. To prevent numerical instability, we clamp sigma: $\sigma = \text{clamp}(\exp(\log\sigma), 10^{-6}, 10)$. However, this creates a degenerate solution where sigma stays at the lower bound, making the model overconfident about incorrect predictions on new data.
-
-\textbf{Diagnosis:} Monitoring sigma statistics during evaluation revealed:
-\begin{itemize}
-  \item Min sigma: $1.2 \times 10^{-3}$ (above emergency floor, but very low)
-  \item Mean sigma: $0.077$ (indicating tight, potentially overconfident predictions)
-  \item Latent prediction MSE: $0.0016$ (good)
-\end{itemize}
-
-These values suggest the model learned latent dynamics reasonably well without full collapse, but the tight sigma indicates limited uncertainty modeling.
-
-\subsubsection{Reward Prediction Failure}
-
-The more severe problem was reward prediction. Verification revealed:
-\begin{itemize}
-  \item Predicted reward range: $[-0.017, +0.034]$ (essentially zero)
-  \item Actual reward range: $[-0.22, +1.30]$
-  \item Correlation: $0.08$ (effectively random)
-\end{itemize}
-
-This failure has multiple causes:
-
-\textbf{Sparse Reward Signal:} Game rewards are inherently sparse---positive rewards only occur when hitting enemies or collecting prizes, which happens infrequently in random policy data. The MDN-RNN's reward head, trained with MSE loss, converges to predicting near-zero (the mean reward), achieving low average loss but providing no useful signal for planning.
-
-\textbf{Random Policy Data Collection:} Using random actions for data collection fails to capture reward-rich transitions. An agent randomly moving and shooting rarely hits enemies or collects prizes. The training data therefore contains few examples of positive rewards, starving the reward prediction head.
-
-\textbf{Loss Function Imbalance:} The MDN loss for latent prediction dominates the reward MSE loss (different scales), causing the optimizer to focus primarily on latent dynamics.
-
-\subsection{Approach 1: Initial Pure Dream Training (Failed)}
+Training the MDN-RNN revealed significant challenges. First, we encountered \textit{sigma collapse}, where the model minimizes the negative log-likelihood objective by shrinking variance toward zero, resulting in overconfident predictions and numerical instability ($-\log p \to -\infty$). We mitigated this by clamping the standard deviation $\sigma \in [10^{-6}, 10]$. Second, the auxiliary reward prediction head failed almost entirely (correlation $0.08$) due to the sparsity of positive rewards in the random training data, causing the MSE loss to converge to the near-zero mean. These issues necessitated the use of real-environment rewards in our hybrid and Dyna approaches.
 
 \subsection{Training Approaches and Results}
 \label{subsec:wm-approaches}
@@ -531,10 +453,10 @@ We evaluated three distinct training strategies for the world model agent. Table
 \toprule
 \textbf{Approach} & \textbf{Methodology} & \textbf{Training Reward} & \textbf{Real Evaluation} \\
 \midrule
-1. Pure Dream & Train on MDN predicted rewards & $\approx 0$ & $-5.2 \pm 3.1$ (Fail) \\
-2. Hybrid & Real rewards + VAE observations & $-2.9 \pm 3.9$ & $-2.9$ (Poor) \\
+1. Pure Dream & Train on MDN predicted rewards & $\approx 0$ & $-5.2 \pm 3.1$  \\
+2. Hybrid & Real rewards + VAE observations & $-2.9 \pm 3.9$ & $-2.9$ \\
 3. Dream Fix & Trained policy data + norm rewards & $\mathbf{+74.3 \pm 0.5}$ & $-6.3 \pm 0.1$ (Exploit) \\
-4. Dyna-Style & Interleaved real/dream + real eval & $-4.9 \pm 1.0$ & $\mathbf{-4.9}$ (Best WM) \\
+4. Dyna-Style & Interleaved real/dream + real eval & $-4.9 \pm 1.0$ & {-4.9}\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -543,9 +465,9 @@ We evaluated three distinct training strategies for the world model agent. Table
 
 \paragraph{2. Hybrid Method (Workaround):} We attempted to bypass the broken reward predictor by using real environment rewards while still observing the VAE's latent state. Performance improved slightly ($-2.9$) but remained poor compared to model-free baselines (+38.7). This highlighted a key issue: the 32-dimensional latent space combined with a noisy, uninformative hidden state (trained on random data) lacks sufficient state information for high-performance control.
 
-\paragraph{3. Dream Exploitation:} To fix the reward prediction, we collected data using a trained policy and normalized rewards. While this yielded excellent \textit{imagined} performance (+74.3), the real-world performance collapsed to $-6.3$. This revealed \textbf{Dream Exploitation}: the agent learned to exploit inaccuracies in the world model rather than learning robust skills.
+\paragraph{3. Dream Exploitation:} To fix the reward prediction, we collected data using a trained policy and normalized rewards. While this yielded excellent \textit{imagined} performance (+74.3), the real-world performance collapsed to $-6.3$. This revealed dream exploitation: the agent learned to exploit inaccuracies in the world model rather than learning robust skills.
 
-\paragraph{4. Dyna-Style Training (Best):} Addressing these failures, we implemented a Dyna-style approach \cite{sutton1991dyna}, training with real rewards and periodically evaluating in the real environment. This proved the most stable method, achieving a best real reward of $-4.9$. While still inferior to pure model-free RL due to the information bottleneck of the visual latent space, it successfully grounded the agent in reality.
+\paragraph{4. Dyna-Style Training (Most Stable WM):} Addressing these failures, we implemented a Dyna-style approach \cite{sutton1991dyna}, training with real rewards and periodically evaluating in the real environment. This proved the most stable world model method, achieving a real reward of $-4.9$. While still significantly inferior to model-free PPO (+38.74) due to the information bottleneck of the visual latent space, it successfully grounded the agent in reality.
 While Dyna-style training prevents dream exploitation, the fundamental limitation of the latent observation space remains. The agent still struggles because the 288-dimensional $[z_t, h_t]$ observation lacks the precise structured information available to model-free agents.
 
 \subsection{Comprehensive Comparison}
@@ -583,7 +505,7 @@ Our world model experiments revealed fundamental challenges when applying imagin
 
 \section{Analysis of SAC Performance Failure}
 
-Soft Actor-Critic (SAC) significantly underperformed compared to DQN and PPO across all experimental configurations, achieving a best result of only $+2.23$ on aggressive/medium compared to PPO's $+38.74$ on aggressive/long---a 17x performance gap. This section analyzes the root causes of SAC's failure in our environment.
+Soft Actor-Critic (SAC) significantly underperformed compared to DQN and PPO across all experimental configurations, achieving a best result of only $+2.23$ on aggressive/medium compared to PPO's $+38.74$ on aggressive/long--a 17x performance gap. This section analyzes the root causes of SAC's failure in our environment.
 
 \subsection{Action Space Mismatch}
 
@@ -611,19 +533,17 @@ Throughout this project, we encountered several technical challenges that requir
 
 \textbf{RGB Rendering for World Model}: The arcade-based game environment required custom implementation for rendering to numpy arrays suitable for neural network training, as the default rendering pipeline was designed for display rather than data collection.
 
-\section{Conclusions and Next Steps}
+\section{Conclusions}
 
-Our experimental results demonstrate that reward shaping significantly influences RL agent performance in the 2D shooter environment. The aggressive reward configuration consistently outperforms alternatives across all algorithms and training durations. Among algorithms, PPO and DQN achieve comparable performance, while SAC underperforms due to action space conversion overhead and slower training.
+Our experiments reveal two key findings. First, \textbf{reward shaping dominates algorithm choice}: PPO with aggressive rewards (+38.74) significantly outperforms all other configurations, while SAC underperforms due to action space mismatch. Second, \textbf{world models underperform model-free methods} in this environment (best: $-4.9$ vs $+38.7$) due to information bottleneck and dream exploitation.
 
-Key findings include:
+Key insights:
 \begin{itemize}
-    \item Reward design dominates algorithm choice in determining final performance
-    \item High standard deviations reflect environmental stochasticity, not training instability
-    \item DQN's reward decrease in sparse-reward scenarios highlights value-based methods' brittleness
-    \item World model approach with BCE loss successfully learns latent representations
+    \item Aggressive reward configurations consistently outperform survival and baseline variants
+    \item World model training in imagination leads to ``dream exploitation'' where agents learn to exploit model inaccuracies
+    \item Dyna-style training with real environment grounding produces the most stable world model results
+    \item World models are best suited for pixel-only environments; structured state availability makes model-free methods more effective
 \end{itemize}
-
-Future work will focus on completing world model training and comparing imagination-based planning with model-free baselines. We also plan to investigate hyperparameter sensitivity and conduct longer training runs for the best-performing configurations.
 
 \bibliographystyle{plain}
 \bibliography{refs}

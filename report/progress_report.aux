@@ -65,9 +65,9 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Algorithm Comparison at 500k timesteps. X-axis: reward configuration (baseline, survival, aggressive). Y-axis: mean episode reward. Bars represent DQN (blue), PPO (green), and SAC (red). Error bars show $\pm 1$ standard deviation. DQN and PPO achieve similar performance, with both significantly outperforming SAC across all configurations.\relax }}{9}{figure.caption.6}\protected@file@percent }
 \newlabel{fig:algo-compare}{{4}{9}{Algorithm Comparison at 500k timesteps. X-axis: reward configuration (baseline, survival, aggressive). Y-axis: mean episode reward. Bars represent DQN (blue), PPO (green), and SAC (red). Error bars show $\pm 1$ standard deviation. DQN and PPO achieve similar performance, with both significantly outperforming SAC across all configurations.\relax }{figure.caption.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Summary Statistics and Discussion}{9}{subsection.5.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Final Performance Across All Configurations (Mean $\pm $ Std over final 10\% of episodes). High standard deviations reflect the stochastic nature of individual episodes---enemy spawns, prize locations, and combat outcomes vary significantly between runs.\relax }}{9}{table.caption.7}\protected@file@percent }
-\newlabel{tab:results}{{3}{9}{Final Performance Across All Configurations (Mean $\pm $ Std over final 10\% of episodes). High standard deviations reflect the stochastic nature of individual episodes---enemy spawns, prize locations, and combat outcomes vary significantly between runs.\relax }{table.caption.7}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Ablation Study: Effect of Reward Shaping}{10}{section.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Final Performance Across All Configurations (Mean $\pm $ Std over final 10\% of episodes). High standard deviations reflect the stochastic nature of individual episodes--enemy spawns, prize locations, and combat outcomes vary significantly between runs.\relax }}{9}{table.caption.7}\protected@file@percent }
+\newlabel{tab:results}{{3}{9}{Final Performance Across All Configurations (Mean $\pm $ Std over final 10\% of episodes). High standard deviations reflect the stochastic nature of individual episodes--enemy spawns, prize locations, and combat outcomes vary significantly between runs.\relax }{table.caption.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Ablation Study: Effect of Reward Shaping (Engineering) }{10}{section.6}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Reward Shaping Ablation Study. X-axis: algorithm (DQN, PPO, SAC). Y-axis: mean episode reward at 500k timesteps. Bars grouped by reward configuration: baseline (blue), survival (orange), aggressive (green). The aggressive configuration consistently achieves the highest performance across all algorithms, demonstrating that reward design dominates algorithm choice.\relax }}{10}{figure.caption.8}\protected@file@percent }
 \newlabel{fig:ablation}{{5}{10}{Reward Shaping Ablation Study. X-axis: algorithm (DQN, PPO, SAC). Y-axis: mean episode reward at 500k timesteps. Bars grouped by reward configuration: baseline (blue), survival (orange), aggressive (green). The aggressive configuration consistently achieves the highest performance across all algorithms, demonstrating that reward design dominates algorithm choice.\relax }{figure.caption.8}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Why Aggressive Rewards Work Best}{10}{subsection.6.1}\protected@file@percent }
@@ -81,43 +81,39 @@
 \newlabel{fig:vae-arch}{{6}{12}{VAE Architecture. The encoder progressively reduces spatial dimensions through four convolutional layers (yellow) from $64\times 64\times 3$ to $4\times 4\times 256$, then projects to $\mu $ and $\sigma $ parameters (red/blue) for the 32-dimensional latent code $z$ (green). The decoder mirrors this structure using transposed convolutions (blue) to reconstruct the original image.\relax }{figure.caption.9}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.2}VAE Loss Function}{12}{subsection.7.2}\protected@file@percent }
 \newlabel{subsec:vae-loss}{{7.2}{12}{VAE Loss Function}{subsection.7.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1}Reconstruction Loss: MSE vs BCE}{12}{subsubsection.7.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}MDN-RNN Dynamics Model}{13}{subsection.7.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}MDN-RNN Dynamics Model}{12}{subsection.7.3}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces MDN-RNN Architecture. The latent state $z_t$ (32-dim) and action $a_t$ (80-dim) are concatenated and processed by an LSTM (256 hidden units). The MDN head outputs mixture weights $\boldsymbol  {\pi }$ (5 components), means $\boldsymbol  {\mu }$, and standard deviations $\boldsymbol  {\sigma }$ for next-state prediction. Auxiliary heads predict reward $\hat  {r}$ and episode termination $\hat  {d}$. Hidden states $h_t$ and $c_t$ maintain temporal context.\relax }}{13}{figure.caption.10}\protected@file@percent }
 \newlabel{fig:mdn-rnn-arch}{{7}{13}{MDN-RNN Architecture. The latent state $z_t$ (32-dim) and action $a_t$ (80-dim) are concatenated and processed by an LSTM (256 hidden units). The MDN head outputs mixture weights $\boldsymbol {\pi }$ (5 components), means $\boldsymbol {\mu }$, and standard deviations $\boldsymbol {\sigma }$ for next-state prediction. Auxiliary heads predict reward $\hat {r}$ and episode termination $\hat {d}$. Hidden states $h_t$ and $c_t$ maintain temporal context.\relax }{figure.caption.10}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Training Results}{13}{subsection.7.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces VAE Reconstruction Results with BCE Loss. Top row: original game frames sampled across different game states. Bottom row: reconstructed frames from the 32-dimensional latent encoding. The VAE successfully preserves entity positions, colors, and sharp boundaries. Reconstruction MSE: 0.00085.\relax }}{14}{figure.caption.11}\protected@file@percent }
-\newlabel{fig:vae-recon}{{8}{14}{VAE Reconstruction Results with BCE Loss. Top row: original game frames sampled across different game states. Bottom row: reconstructed frames from the 32-dimensional latent encoding. The VAE successfully preserves entity positions, colors, and sharp boundaries. Reconstruction MSE: 0.00085.\relax }{figure.caption.11}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Latent Space Properties}{14}{subsection.7.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces VAE Reconstruction Results with BCE Loss. Top row: original game frames sampled across different game states. Bottom row: reconstructed frames from the 32-dimensional latent encoding. The VAE successfully preserves entity positions, colors, and sharp boundaries. Reconstruction MSE: 0.00085.\relax }}{13}{figure.caption.11}\protected@file@percent }
+\newlabel{fig:vae-recon}{{8}{13}{VAE Reconstruction Results with BCE Loss. Top row: original game frames sampled across different game states. Bottom row: reconstructed frames from the 32-dimensional latent encoding. The VAE successfully preserves entity positions, colors, and sharp boundaries. Reconstruction MSE: 0.00085.\relax }{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Latent Space Properties}{13}{subsection.7.5}\protected@file@percent }
 \@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Latent Space Interpolation (BCE-trained VAE). Linear interpolation between two game states produces semantically meaningful intermediate frames. Start and End show actual game states; intermediate images ($\alpha = 0.14$ to $\alpha = 0.86$) are decoded from interpolated latent vectors. Smooth transitions indicate a well-structured latent manifold suitable for dynamics modeling.\relax }}{14}{figure.caption.12}\protected@file@percent }
 \newlabel{fig:vae-interp}{{9}{14}{Latent Space Interpolation (BCE-trained VAE). Linear interpolation between two game states produces semantically meaningful intermediate frames. Start and End show actual game states; intermediate images ($\alpha = 0.14$ to $\alpha = 0.86$) are decoded from interpolated latent vectors. Smooth transitions indicate a well-structured latent manifold suitable for dynamics modeling.\relax }{figure.caption.12}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}Comparison to DreamerV2}{14}{subsection.7.6}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Architectural Comparison between our implementation and DreamerV2. Our staged approach trades end-to-end optimization for clearer debugging and component validation.\relax }}{15}{table.caption.13}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.7}MDN-RNN Training Challenges: Reward Prediction and Sigma Collapse}{15}{subsection.7.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.7.1}The Sigma Hacking Problem}{15}{subsubsection.7.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.7.2}Reward Prediction Failure}{15}{subsubsection.7.7.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}MDN-RNN Training Challenges: Reward Prediction and Sigma Collapse}{14}{subsection.7.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.7}Training Approaches and Results}{14}{subsection.7.7}\protected@file@percent }
+\newlabel{subsec:wm-approaches}{{7.7}{14}{Training Approaches and Results}{subsection.7.7}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Summary of World Model Training Approaches\relax }}{14}{table.caption.13}\protected@file@percent }
+\newlabel{tab:wm-summary}{{4}{14}{Summary of World Model Training Approaches\relax }{table.caption.13}{}}
+\@writefile{toc}{\contentsline {paragraph}{1. Pure Dream Training:}{14}{section*.14}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{2. Hybrid Method (Workaround):}{14}{section*.15}\protected@file@percent }
 \citation{sutton1991dyna}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.8}Approach 1: Initial Pure Dream Training (Failed)}{16}{subsection.7.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.9}Training Approaches and Results}{16}{subsection.7.9}\protected@file@percent }
-\newlabel{subsec:wm-approaches}{{7.9}{16}{Training Approaches and Results}{subsection.7.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Summary of World Model Training Approaches\relax }}{16}{table.caption.14}\protected@file@percent }
-\newlabel{tab:wm-summary}{{5}{16}{Summary of World Model Training Approaches\relax }{table.caption.14}{}}
-\@writefile{toc}{\contentsline {paragraph}{1. Pure Dream Training:}{16}{section*.15}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{2. Hybrid Method (Workaround):}{16}{section*.16}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{3. Dream Exploitation:}{16}{section*.17}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{4. Dyna-Style Training (Best):}{16}{section*.18}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.10}Comprehensive Comparison}{17}{subsection.7.10}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Comparison of world model training approaches. Pure Dream achieves +74.3 in imagination but \textbf  {catastrophically fails} in real evaluation (-6.3), demonstrating dream exploitation. Hybrid and Dyna-style approaches produce more modest but consistent results. Model-free PPO remains the best performer (+38.74) because it observes structured game state directly.\relax }}{17}{figure.caption.19}\protected@file@percent }
-\newlabel{fig:wm-comparison}{{10}{17}{Comparison of world model training approaches. Pure Dream achieves +74.3 in imagination but \textbf {catastrophically fails} in real evaluation (-6.3), demonstrating dream exploitation. Hybrid and Dyna-style approaches produce more modest but consistent results. Model-free PPO remains the best performer (+38.74) because it observes structured game state directly.\relax }{figure.caption.19}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Learning curves for each world model approach. Left: Pure dream training shows rapid reward increase to +74 (in imagination). Center: Hybrid training converges to approximately -2.88 using real environment rewards. Right: Dyna-style periodic real evaluation shows consistent performance around -5 to -6.\relax }}{17}{figure.caption.20}\protected@file@percent }
-\newlabel{fig:wm-learning-curves}{{11}{17}{Learning curves for each world model approach. Left: Pure dream training shows rapid reward increase to +74 (in imagination). Center: Hybrid training converges to approximately -2.88 using real environment rewards. Right: Dyna-style periodic real evaluation shows consistent performance around -5 to -6.\relax }{figure.caption.20}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.11}Discussion: Why World Models Underperformed}{17}{subsection.7.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{3. Dream Exploitation:}{15}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{4. Dyna-Style Training (Most Stable WM):}{15}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.8}Comprehensive Comparison}{15}{subsection.7.8}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Comparison of world model training approaches. Pure Dream achieves +74.3 in imagination but \textbf  {catastrophically fails} in real evaluation (-6.3), demonstrating dream exploitation. Hybrid and Dyna-style approaches produce more modest but consistent results. Model-free PPO remains the best performer (+38.74) because it observes structured game state directly.\relax }}{15}{figure.caption.18}\protected@file@percent }
+\newlabel{fig:wm-comparison}{{10}{15}{Comparison of world model training approaches. Pure Dream achieves +74.3 in imagination but \textbf {catastrophically fails} in real evaluation (-6.3), demonstrating dream exploitation. Hybrid and Dyna-style approaches produce more modest but consistent results. Model-free PPO remains the best performer (+38.74) because it observes structured game state directly.\relax }{figure.caption.18}{}}
 \citation{worldmodels}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Analysis of SAC Performance Failure}{18}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Action Space Mismatch}{18}{subsection.8.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Training Speed Penalty}{18}{subsection.8.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Entropy Regularization Interference}{18}{subsection.8.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Episode Length Observations}{18}{subsection.8.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Learning curves for each world model approach. Left: Pure dream training shows rapid reward increase to +74 (in imagination). Center: Hybrid training converges to approximately -2.88 using real environment rewards. Right: Dyna-style periodic real evaluation shows consistent performance around -5 to -6.\relax }}{16}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:wm-learning-curves}{{11}{16}{Learning curves for each world model approach. Left: Pure dream training shows rapid reward increase to +74 (in imagination). Center: Hybrid training converges to approximately -2.88 using real environment rewards. Right: Dyna-style periodic real evaluation shows consistent performance around -5 to -6.\relax }{figure.caption.19}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.9}Discussion: Why World Models Underperformed}{16}{subsection.7.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {8}Analysis of SAC Performance Failure}{16}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Action Space Mismatch}{16}{subsection.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Training Speed Penalty}{17}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Entropy Regularization Interference}{17}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Episode Length Observations}{17}{subsection.8.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {9}Challenges and Issues Encountered}{17}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {10}Conclusions}{17}{section.10}\protected@file@percent }
 \bibstyle{plain}
 \bibdata{refs}
 \bibcite{cobbe2019generalization}{1}
@@ -125,8 +121,6 @@
 \bibcite{worldmodels}{3}
 \bibcite{dreamerv1}{4}
 \bibcite{dreamerv2}{5}
-\@writefile{toc}{\contentsline {section}{\numberline {9}Challenges and Issues Encountered}{19}{section.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {10}Conclusions and Next Steps}{19}{section.10}\protected@file@percent }
 \bibcite{dreamerv3}{6}
 \bibcite{juliani2018unity}{7}
 \bibcite{kempka2016vizdoom}{8}
@@ -136,4 +130,4 @@
 \bibcite{sutton1991dyna}{12}
 \bibcite{tobin2017domain}{13}
 \bibcite{coom}{14}
-\gdef \@abspage@last{20}
+\gdef \@abspage@last{18}
