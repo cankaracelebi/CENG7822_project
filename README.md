@@ -108,18 +108,40 @@ python -m world_model.verify_world_model --model-dir ./trained_models/world_mode
 
 ## Project Structure
 
+### Code Summary
+
+| Module | File | Description |
+|--------|------|-------------|
+| **Game** | `game/g2D/shooter_env.py` | Arcade-based 2D shooter Gymnasium environment with configurable rewards |
+| **Game** | `game/g2D/entities.py` | Agent, Enemy, Prize, Bullet dataclasses |
+| **RL Training** | `rl/train.py` | Model-free training script (PPO, DQN, SAC) with reward configs |
+| **RL Eval** | `rl/evaluate.py` | Evaluation script with video recording |
+| **World Model** | `world_model/vae.py` | Convolutional VAE (64×64→32-dim latent) with BCE loss |
+| **World Model** | `world_model/mdn_rnn.py` | MDN-RNN dynamics model (5 Gaussian mixtures, reward/done prediction) |
+| **World Model** | `world_model/dream_env.py` | DreamEnv wrapper for imagination-based rollouts |
+| **World Model** | `world_model/train_world_model_ppo.py` | Full pipeline: data collection → VAE → MDN-RNN → PPO |
+| **World Model** | `world_model/train_dyna.py` | Dyna-style training (interleaved real/dream) |
+| **World Model** | `world_model/verify_world_model.py` | Diagnostic script for VAE/MDN-RNN quality |
+
+### Directory Layout
+
 ```
 ├── game/                    # Game environment
-│   └── game.py             # ShooterEnv (Gymnasium-compatible)
+│   └── g2D/                 # Arcade-based 2D shooter
+│       ├── shooter_env.py   # ShooterEnv (Gymnasium-compatible)
+│       ├── entities.py      # Game entities (Agent, Enemy, Prize, Bullet)
+│       └── utils.py         # Helper functions
 ├── rl/                      # Model-free RL implementations
-│   ├── train.py            # Training script
-│   └── evaluate.py         # Evaluation with video recording
+│   ├── train.py             # Training script
+│   └── evaluate.py          # Evaluation with video recording
 ├── world_model/             # World Models implementation
-│   ├── vae.py              # Variational Autoencoder 
-│   ├── mdn_rnn.py          # Mixture Density Network RNN
+│   ├── vae.py               # Variational Autoencoder 
+│   ├── mdn_rnn.py           # Mixture Density Network RNN
+│   ├── dream_env.py         # Dream environment wrapper
 │   ├── train_world_model_ppo.py  # Full training pipeline
-│   ├── train_dyna.py       # Dyna-style training 
-│   └── verify_world_model.py
+│   ├── train_dyna.py        # Dyna-style training 
+│   └── verify_world_model.py # Model diagnostics
+├── trained_models/          # Pre-trained models
 ├── report/                  # LaTeX report
 ├── presentation/            # Beamer presentation
 └── report_figures/          # Generated figures
