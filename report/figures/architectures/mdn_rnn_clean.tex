@@ -1,0 +1,166 @@
+\documentclass[border=10pt]{standalone}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usetikzlibrary{positioning, shapes.geometric, arrows.meta, fit, backgrounds, calc}
+
+\begin{document}
+
+\tikzset{
+    % Node styles
+    input/.style={
+        rectangle, 
+        draw=blue!70, 
+        fill=blue!15, 
+        thick,
+        minimum width=2cm, 
+        minimum height=0.8cm,
+        rounded corners=3pt,
+        font=\small\bfseries
+    },
+    concat/.style={
+        circle, 
+        draw=green!70!black, 
+        fill=green!20, 
+        thick,
+        minimum size=0.8cm,
+        font=\small\bfseries
+    },
+    lstm/.style={
+        rectangle, 
+        draw=orange!80!black, 
+        fill=orange!25, 
+        very thick,
+        minimum width=3cm, 
+        minimum height=2.5cm,
+        rounded corners=5pt,
+        font=\bfseries
+    },
+    hidden/.style={
+        rectangle, 
+        draw=purple!70, 
+        fill=purple!15, 
+        thick,
+        minimum width=1.5cm, 
+        minimum height=0.6cm,
+        rounded corners=3pt,
+        font=\small
+    },
+    output/.style={
+        rectangle, 
+        draw=red!70, 
+        fill=red!15, 
+        thick,
+        minimum width=1.8cm, 
+        minimum height=0.7cm,
+        rounded corners=3pt,
+        font=\small\bfseries
+    },
+    mdn/.style={
+        rectangle, 
+        draw=yellow!80!black, 
+        fill=yellow!25, 
+        thick,
+        minimum width=1.8cm, 
+        minimum height=0.7cm,
+        rounded corners=3pt,
+        font=\small\bfseries
+    },
+    latent/.style={
+        rectangle, 
+        draw=teal!70, 
+        fill=teal!15, 
+        thick,
+        minimum width=2cm, 
+        minimum height=0.8cm,
+        rounded corners=3pt,
+        font=\small\bfseries
+    },
+    arrow/.style={
+        ->,
+        >=Stealth,
+        thick,
+        draw=gray!70
+    },
+    label/.style={
+        font=\scriptsize,
+        text=gray!80!black
+    }
+}
+
+\begin{tikzpicture}[node distance=1.2cm and 1.5cm]
+
+    % === INPUTS ===
+    \node[input] (z_t) {$z_t$ (32)};
+    \node[input, below=0.8cm of z_t] (a_t) {$a_t$ (80)};
+    
+    % Concatenation
+    \node[concat, right=1.5cm of $(z_t)!0.5!(a_t)$] (concat) {$\oplus$};
+    
+    % Input dimension label
+    \node[label, below=0.1cm of concat] {112};
+    
+    % === LSTM ===
+    \node[lstm, right=2cm of concat] (lstm) {LSTM};
+    \node[label, below=0.2cm of lstm.south] {hidden: 256};
+    
+    % Hidden states (recurrent)
+    \node[hidden, above=1cm of lstm] (h_t) {$h_t$ (256)};
+    \node[hidden, above=0.3cm of h_t] (c_t) {$c_t$ (256)};
+    
+    % === OUTPUT HEADS ===
+    % MDN outputs (stacked vertically on the right)
+    \node[mdn, right=2.5cm of lstm, yshift=1.2cm] (pi) {$\boldsymbol{\pi}$ (5)};
+    \node[mdn, below=0.4cm of pi] (mu) {$\boldsymbol{\mu}$ (5$\times$32)};
+    \node[mdn, below=0.4cm of mu] (sigma) {$\boldsymbol{\sigma}$ (5$\times$32)};
+    
+    % Reward and Done heads
+    \node[output, below=0.4cm of sigma] (reward) {$\hat{r}$ (1)};
+    \node[output, below=0.4cm of reward] (done) {$\hat{d}$ (1)};
+    
+    % === SAMPLED OUTPUT ===
+    \node[latent, right=1.5cm of mu] (z_next) {$z_{t+1}$ (32)};
+    
+    % === ARROWS ===
+    % Inputs to concat
+    \draw[arrow] (z_t.east) -- ++(0.5,0) |- (concat.west);
+    \draw[arrow] (a_t.east) -- ++(0.5,0) |- (concat.west);
+    
+    % Concat to LSTM
+    \draw[arrow] (concat) -- (lstm);
+    
+    % LSTM to outputs (single line that branches)
+    \draw[arrow] (lstm.east) -- ++(0.8,0) coordinate (branch);
+    \draw[arrow] (branch) |- (pi.west);
+    \draw[arrow] (branch) |- (mu.west);
+    \draw[arrow] (branch) |- (sigma.west);
+    \draw[arrow] (branch) |- (reward.west);
+    \draw[arrow] (branch) |- (done.west);
+    
+    % MDN to z_next (sampling)
+    \draw[arrow, dashed, draw=teal!70] (pi.east) -- ++(0.3,0) |- (z_next.west);
+    \draw[arrow, draw=teal!70] (mu.east) -- (z_next.west);
+    \draw[arrow, dashed, draw=teal!70] (sigma.east) -- ++(0.3,0) |- (z_next.west);
+    
+    % Recurrent connection (curved arrow back)
+    \draw[arrow, draw=purple!60] (lstm.north) -- (h_t.south);
+    \draw[arrow, draw=purple!60, dashed] (h_t.west) -- ++(-0.8,0) |- ([yshift=0.5cm]lstm.west) -- (lstm.west);
+    
+    % === LABELS ===
+    % Group labels
+    \node[above=0.1cm of c_t, font=\footnotesize\itshape, text=purple!70] {Hidden States};
+    
+    % MDN label
+    \begin{scope}[on background layer]
+        \node[fit=(pi)(mu)(sigma), draw=yellow!60, fill=yellow!5, rounded corners=8pt, inner sep=8pt] (mdn_box) {};
+    \end{scope}
+    \node[above=0.1cm of mdn_box.north, font=\footnotesize\itshape, text=yellow!80!black] {MDN Head};
+    
+    % Auxiliary heads label
+    \begin{scope}[on background layer]
+        \node[fit=(reward)(done), draw=red!40, fill=red!5, rounded corners=5pt, inner sep=5pt] (aux_box) {};
+    \end{scope}
+    \node[below=0.1cm of aux_box.south, font=\footnotesize\itshape, text=red!70] {Auxiliary Heads};
+
+\end{tikzpicture}
+
+\end{document}

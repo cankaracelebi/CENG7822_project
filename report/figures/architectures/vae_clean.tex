@@ -1,0 +1,175 @@
+\documentclass[border=10pt]{standalone}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usetikzlibrary{positioning, shapes.geometric, arrows.meta, fit, backgrounds, calc, decorations.pathreplacing}
+
+\begin{document}
+
+\tikzset{
+    % Node styles
+    img/.style={
+        rectangle, 
+        draw=gray!70, 
+        fill=gray!10, 
+        thick,
+        minimum width=1.2cm, 
+        minimum height=1.8cm,
+        rounded corners=3pt,
+        font=\small\bfseries
+    },
+    conv/.style={
+        rectangle, 
+        draw=yellow!80!black, 
+        fill=yellow!25, 
+        thick,
+        minimum width=0.9cm, 
+        minimum height=1.4cm,
+        rounded corners=3pt,
+        font=\scriptsize\bfseries
+    },
+    deconv/.style={
+        rectangle, 
+        draw=blue!70, 
+        fill=blue!20, 
+        thick,
+        minimum width=0.9cm, 
+        minimum height=1.4cm,
+        rounded corners=3pt,
+        font=\scriptsize\bfseries
+    },
+    fc/.style={
+        rectangle, 
+        draw=purple!70, 
+        fill=purple!15, 
+        thick,
+        minimum width=0.8cm, 
+        minimum height=1cm,
+        rounded corners=2pt,
+        font=\scriptsize\bfseries
+    },
+    latent/.style={
+        rectangle, 
+        draw=green!70!black, 
+        fill=green!25, 
+        very thick,
+        minimum width=1cm, 
+        minimum height=1.2cm,
+        rounded corners=4pt,
+        font=\small\bfseries
+    },
+    param/.style={
+        rectangle, 
+        draw=red!70, 
+        fill=red!15, 
+        thick,
+        minimum width=0.7cm, 
+        minimum height=0.6cm,
+        rounded corners=2pt,
+        font=\scriptsize\bfseries
+    },
+    arrow/.style={
+        ->,
+        >=Stealth,
+        thick,
+        draw=gray!60
+    },
+    label/.style={
+        font=\tiny,
+        text=gray!70!black
+    }
+}
+
+\begin{tikzpicture}[node distance=0.5cm and 0.8cm]
+
+    % === ENCODER ===
+    % Input image
+    \node[img] (input) {};
+    \node[below=0.15cm of input, font=\scriptsize] {64$\times$64$\times$3};
+    \node[above=0.1cm of input, font=\scriptsize\itshape, text=gray] {Input};
+    
+    % Conv layers (encoder)
+    \node[conv, right=0.8cm of input, minimum height=1.3cm] (conv1) {32};
+    \node[below=0.15cm of conv1, font=\tiny, text=gray] {32$\times$32};
+    
+    \node[conv, right=0.5cm of conv1, minimum height=1.1cm] (conv2) {64};
+    \node[below=0.15cm of conv2, font=\tiny, text=gray] {16$\times$16};
+    
+    \node[conv, right=0.5cm of conv2, minimum height=0.9cm] (conv3) {128};
+    \node[below=0.15cm of conv3, font=\tiny, text=gray] {8$\times$8};
+    
+    \node[conv, right=0.5cm of conv3, minimum height=0.7cm] (conv4) {256};
+    \node[below=0.15cm of conv4, font=\tiny, text=gray] {4$\times$4};
+    
+    % Flatten + FC to mu/sigma
+    \node[fc, right=0.8cm of conv4] (fc_enc) {FC};
+    \node[below=0.15cm of fc_enc, font=\tiny, text=gray] {4096};
+    
+    % Mu and Sigma
+    \node[param, right=0.7cm of fc_enc, yshift=0.4cm] (mu) {$\boldsymbol{\mu}$};
+    \node[param, right=0.7cm of fc_enc, yshift=-0.4cm] (sigma) {$\boldsymbol{\sigma}$};
+    \node[below=0.1cm of sigma, font=\tiny, text=gray] {32};
+    
+    % === LATENT SPACE ===
+    \node[latent, right=0.8cm of $(mu)!0.5!(sigma)$] (z) {$\mathbf{z}$};
+    \node[below=0.2cm of z, font=\scriptsize, text=green!60!black] {32-dim};
+    
+    % === DECODER ===
+    % FC from z
+    \node[fc, right=0.8cm of z] (fc_dec) {FC};
+    \node[below=0.15cm of fc_dec, font=\tiny, text=gray] {4096};
+    
+    % Reshape
+    \node[deconv, right=0.5cm of fc_dec, minimum height=0.7cm] (reshape) {256};
+    \node[below=0.15cm of reshape, font=\tiny, text=gray] {4$\times$4};
+    
+    % DeConv layers (decoder)
+    \node[deconv, right=0.5cm of reshape, minimum height=0.9cm] (deconv1) {128};
+    \node[below=0.15cm of deconv1, font=\tiny, text=gray] {8$\times$8};
+    
+    \node[deconv, right=0.5cm of deconv1, minimum height=1.1cm] (deconv2) {64};
+    \node[below=0.15cm of deconv2, font=\tiny, text=gray] {16$\times$16};
+    
+    \node[deconv, right=0.5cm of deconv2, minimum height=1.3cm] (deconv3) {32};
+    \node[below=0.15cm of deconv3, font=\tiny, text=gray] {32$\times$32};
+    
+    % Output image
+    \node[img, right=0.8cm of deconv3] (output) {};
+    \node[below=0.15cm of output, font=\scriptsize] {64$\times$64$\times$3};
+    \node[above=0.1cm of output, font=\scriptsize\itshape, text=gray] {Recon.};
+    
+    % === ARROWS ===
+    \draw[arrow] (input) -- (conv1);
+    \draw[arrow] (conv1) -- (conv2);
+    \draw[arrow] (conv2) -- (conv3);
+    \draw[arrow] (conv3) -- (conv4);
+    \draw[arrow] (conv4) -- (fc_enc);
+    \draw[arrow] (fc_enc.east) -- ++(0.3,0) |- (mu.west);
+    \draw[arrow] (fc_enc.east) -- ++(0.3,0) |- (sigma.west);
+    \draw[arrow] (mu.east) -- ++(0.3,0) |- (z.west);
+    \draw[arrow, dashed] (sigma.east) -- ++(0.3,0) |- (z.west);
+    \draw[arrow] (z) -- (fc_dec);
+    \draw[arrow] (fc_dec) -- (reshape);
+    \draw[arrow] (reshape) -- (deconv1);
+    \draw[arrow] (deconv1) -- (deconv2);
+    \draw[arrow] (deconv2) -- (deconv3);
+    \draw[arrow] (deconv3) -- (output);
+    
+    % === GROUP LABELS ===
+    % Encoder label
+    \begin{scope}[on background layer]
+        \node[fit=(conv1)(conv2)(conv3)(conv4), draw=yellow!50, fill=yellow!5, rounded corners=8pt, inner sep=6pt] (enc_box) {};
+    \end{scope}
+    \node[above=0.25cm of enc_box.north, font=\footnotesize\bfseries, text=yellow!70!black] {Encoder (Conv2D)};
+    
+    % Decoder label
+    \begin{scope}[on background layer]
+        \node[fit=(reshape)(deconv1)(deconv2)(deconv3), draw=blue!40, fill=blue!5, rounded corners=8pt, inner sep=6pt] (dec_box) {};
+    \end{scope}
+    \node[above=0.25cm of dec_box.north, font=\footnotesize\bfseries, text=blue!60!black] {Decoder (ConvTranspose2D)};
+    
+    % Reparameterization trick annotation
+    \node[above=0.6cm of z, font=\tiny\itshape, text=green!50!black, align=center] {Reparameterization\\$z = \mu + \sigma \cdot \epsilon$};
+
+\end{tikzpicture}
+
+\end{document}

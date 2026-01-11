@@ -1,0 +1,183 @@
+
+\documentclass[border=8pt, multi, tikz]{standalone} 
+\usepackage{import}
+\subimport{/home/guava/Desktop/CENG7822_project/PlotNeuralNet/layers/}{init}
+\usetikzlibrary{positioning}
+\usetikzlibrary{3d} %for including external image 
+
+\def\ConvColor{rgb:yellow,5;red,2.5;white,5}
+\def\ConvReluColor{rgb:yellow,5;red,5;white,5}
+\def\PoolColor{rgb:red,1;black,0.3}
+\def\UnpoolColor{rgb:blue,2;green,1;black,0.3}
+\def\FcColor{rgb:blue,5;red,2.5;white,5}
+\def\FcReluColor{rgb:blue,5;red,5;white,4}
+\def\SoftmaxColor{rgb:magenta,5;black,7}   
+\def\SumColor{rgb:blue,5;green,15}
+
+\newcommand{\copymidarrow}{\tikz \draw[-Stealth,line width=0.8mm,draw={rgb:blue,4;red,1;green,1;black,3}] (-0.3,0) -- ++(0.3,0);}
+
+\begin{document}
+\begin{tikzpicture}
+\tikzstyle{connection}=[ultra thick,every node/.style={sloped,allow upside down},draw=\edgecolor,opacity=0.7]
+\tikzstyle{copyconnection}=[ultra thick,every node/.style={sloped,allow upside down},draw={rgb:blue,4;red,1;green,1;black,3},opacity=0.7]
+
+\pic[shift={(0,0,0)}] at (0,0,0) 
+    {Box={
+        name=z_in,
+        caption=$z_t$,
+        xlabel={{32, }},
+        fill={rgb:blue,4;white,4},
+        height=3,
+        width=1,
+        depth=8
+        }
+    };
+
+\pic[shift={(0,-3,0)}] at (z_in-south) 
+    {Box={
+        name=a_in,
+        caption=$a_t$,
+        xlabel={{80, }},
+        fill={rgb:blue,4;white,4},
+        height=3,
+        width=1,
+        depth=12
+        }
+    };
+
+\pic[shift={(2.5,1.5,0)}] at (a_in-east) 
+    {Box={
+        name=concat,
+        caption=Concat,
+        xlabel={{112, }},
+        fill={rgb:green,3;blue,2;white,4},
+        height=4,
+        width=1.5,
+        depth=14
+        }
+    };
+
+\draw [connection]  (z_in-east)    -- node {\midarrow} (concat-west);
+
+\draw [connection]  (a_in-east)    -- node {\midarrow} (concat-west);
+
+\pic[shift={(3,0,0)}] at (concat-east) 
+    {Box={
+        name=lstm,
+        caption=LSTM,
+        xlabel={{256, }},
+        fill={rgb:orange,5;red,2;white,3},
+        height=10,
+        width=5,
+        depth=10
+        }
+    };
+
+\draw [connection]  (concat-east)    -- node {\midarrow} (lstm-west);
+
+\pic[shift={(0,7,0)}] at (lstm-north) 
+    {Box={
+        name=hidden_h,
+        caption=$h_t$,
+        xlabel={{256, }},
+        fill={rgb:purple,4;white,3},
+        height=1.5,
+        width=0.8,
+        depth=5
+        }
+    };
+\pic[shift={(0,-1.5,0)}] at (hidden_h-south) 
+    {Box={
+        name=hidden_c,
+        caption=$c_t$,
+        xlabel={{256, }},
+        fill={rgb:purple,3;white,4},
+        height=1.5,
+        width=0.8,
+        depth=5
+        }
+    };
+
+% MDN mixture weights π
+\pic[shift={(3,2,0)}] at (lstm-east) 
+    {Box={
+        name=mdn_pi,
+        caption=$\pi$,
+        xlabel={{5, }},
+        fill={rgb:yellow,5;red,2;white,3},
+        height=2,
+        width=1,
+        depth=6
+        }
+    };
+% MDN means μ  
+\pic[shift={(0,-2.2,0)}] at (mdn_pi-south) 
+    {Box={
+        name=mdn_mu,
+        caption=$\mu$,
+        xlabel={{5x32, }},
+        fill={rgb:red,4;white,3},
+        height=2,
+        width=1,
+        depth=10
+        }
+    };
+% MDN stds σ
+\pic[shift={(0,-2.2,0)}] at (mdn_mu-south) 
+    {Box={
+        name=mdn_sigma,
+        caption=$\sigma$,
+        xlabel={{5x32, }},
+        fill={rgb:blue,4;white,3},
+        height=2,
+        width=1,
+        depth=10
+        }
+    };
+
+\draw [connection]  (lstm-east)    -- node {\midarrow} (mdn_pi-west);
+
+\pic[shift={(3,-1,0)}] at (lstm-east) 
+    {Box={
+        name=reward,
+        caption=$\hat{r}$,
+        xlabel={{1, }},
+        fill={rgb:green,5;white,3},
+        height=2,
+        width=1,
+        depth=4
+        }
+    };
+
+\draw [connection]  (lstm-east)    -- node {\midarrow} (reward-west);
+
+\pic[shift={(3,-3,0)}] at (lstm-east) 
+    {Box={
+        name=done,
+        caption=$\hat{d}$,
+        xlabel={{1, }},
+        fill={rgb:red,5;white,3},
+        height=2,
+        width=1,
+        depth=4
+        }
+    };
+
+\draw [connection]  (lstm-east)    -- node {\midarrow} (done-west);
+
+\pic[shift={(3,0,0)}] at (mdn_mu-east) 
+    {Box={
+        name=z_next,
+        caption=$z_{t+1}$,
+        xlabel={{32, }},
+        fill={rgb:blue,4;white,4},
+        height=3,
+        width=1,
+        depth=8
+        }
+    };
+
+\draw [connection]  (mdn_mu-east)    -- node {\midarrow} (z_next-west);
+
+\end{tikzpicture}
+\end{document}

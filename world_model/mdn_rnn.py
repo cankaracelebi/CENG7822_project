@@ -291,10 +291,11 @@ class MDNRNN(nn.Module):
         total_loss = mdn_loss
         metrics = {'mdn_loss': mdn_loss.item()}
         
-        # Reward prediction loss
+        # Reward prediction loss (weighted by reward_weight if set)
         if reward_pred is not None and reward_target is not None:
             r_loss = F.mse_loss(reward_pred, reward_target)
-            total_loss = total_loss + r_loss
+            reward_weight = getattr(self, 'reward_weight', 1.0)
+            total_loss = total_loss + reward_weight * r_loss
             metrics['reward_loss'] = r_loss.item()
         
         # Done prediction loss

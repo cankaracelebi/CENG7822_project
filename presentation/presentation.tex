@@ -1,0 +1,633 @@
+\documentclass[aspectratio=169]{beamer}
+
+% Theme and colors
+\usetheme{Madrid}
+\usecolortheme{whale}
+\setbeamertemplate{navigation symbols}{}
+
+% Custom footer with name and course
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
+    \usebeamerfont{author in head/foot}Can Karaçelebi
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}CENG 7822
+  \end{beamercolorbox}%
+  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
+    \usebeamerfont{date in head/foot}\insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
+  \end{beamercolorbox}}%
+  \vskip0pt%
+}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{hyperref}
+
+% Graphics path
+\graphicspath{{figures/}}
+
+% Title information
+\title[Applied RL: 2D Shooter]{Applied Reinforcement Learning\\for a 2D Shooter Game Environment}
+\subtitle{World Models, Reward Shaping, and COOM Benchmark}
+\author{Can Karaçelebi}
+\institute{CENG 7822 - Reinforcement Learning}
+\date{\today}
+
+\begin{document}
+
+% ==============================================================================
+% TITLE SLIDE
+% ==============================================================================
+\begin{frame}
+\titlepage
+\end{frame}
+
+% ==============================================================================
+% OUTLINE
+% ==============================================================================
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+% ==============================================================================
+% SECTION 1: INTRODUCTION
+% ==============================================================================
+\section{Introduction}
+
+\begin{frame}{Project Overview}
+\begin{columns}
+\column{0.6\textwidth}
+\textbf{Goal:} Train autonomous agents for a 2D top-down shooter game
+
+\vspace{0.5em}
+\textbf{Challenges:}
+\begin{itemize}
+    \item Multi-objective optimization (survive, collect, eliminate)
+    \item Continuous state dynamics
+    \item Reactive and strategic decision-making
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Approaches:}
+\begin{itemize}
+    \item Model-free RL: DQN, PPO, SAC
+    \item Model-based RL: World Models (VAE + MDN-RNN)
+\end{itemize}
+
+\column{0.4\textwidth}
+\centering
+\includegraphics[width=0.95\textwidth]{game_screenshot.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Environment Details}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{State Space:}
+\begin{itemize}
+    \item Agent position \& velocity
+    \item Health, cooldown status
+    \item Nearest enemies (relative positions)
+    \item Nearest prizes (relative positions)
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Action Space:}
+\begin{itemize}
+    \item Movement: 5 options (stay, N, S, E, W)
+    \item Shoot: 2 options (fire, hold)
+    \item Direction: 8 options (8 angles)
+    \item Total: $5 \times 2 \times 8 = 80$ combinations
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Reward Configurations:}
+\begin{table}
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+\textbf{Event} & \textbf{Base} & \textbf{Surv} & \textbf{Aggr} \\
+\midrule
+Prize & +1.0 & +0.5 & +2.0 \\
+Kill & +1.0 & +0.5 & +2.0 \\
+Damage & $-$1.0 & $-$3.0 & $-$0.5 \\
+Death & $-$5.0 & $-$10.0 & $-$3.0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\end{columns}
+\end{frame}
+
+% ==============================================================================
+% SECTION 2: COOM BENCHMARK (DETAILED SHOWCASE)
+% ==============================================================================
+\section{Paper Showcase: COOM Benchmark}
+
+\begin{frame}{COOM: Continual DOOM}
+\centering
+\textbf{COOM: A Game Benchmark for Continual Reinforcement Learning}\\
+\vspace{0.3em}
+\textit{Tomilin, Fang, Zhang, Pechenizkiy}\\
+\textbf{NeurIPS 2023} (Datasets and Benchmarks Track)
+
+\vspace{0.8em}
+\begin{alertblock}{Key Contribution}
+First benchmark specifically designed for \textbf{continual reinforcement learning} in complex 3D image-based environments with varying objectives and visuals.
+\end{alertblock}
+
+\vspace{0.8em}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Built on:} ViZDoom platform
+\column{0.5\textwidth}
+\textbf{Available:} \url{https://github.com/hyintell/COOM}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Why Continual RL Matters}
+\textbf{Traditional RL:} Train on one task, evaluate on same task
+
+\vspace{0.5em}
+\textbf{Continual RL:} Train on sequence of tasks, retain knowledge
+
+\vspace{1em}
+\textbf{Key Challenges:}
+\begin{enumerate}
+    \item \textbf{Catastrophic Forgetting}: Performance on task 1 degrades after training on task 2
+    \item \textbf{Knowledge Transfer}: Can skills from task 1 accelerate learning task 2?
+    \item \textbf{Sample Efficiency}: How quickly can the agent adapt to new scenarios?
+\end{enumerate}
+
+\vspace{0.5em}
+\textbf{Real-world motivation:}
+\begin{itemize}
+    \item Robots deployed in changing environments
+    \item Game AI that adapts to new levels/mechanics
+    \item Agents that should improve over time, not reset
+\end{itemize}
+\end{frame}
+
+\begin{frame}{COOM Scenarios (8 Total)}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Combat Scenarios:}
+\begin{itemize}
+    \item \textbf{Run and Gun}: Eliminate enemies with ranged weapons
+    \item \textbf{Chainsaw}: Melee combat, seek and chainsaw enemies
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Evasion Scenarios:}
+\begin{itemize}
+    \item \textbf{Hide and Seek}: Escape and hide from pursuing enemies
+    \item \textbf{Floor is Lava}: Platform navigation to safe zones
+\end{itemize}
+
+\column{0.5\textwidth}
+\textbf{Navigation Scenarios:}
+\begin{itemize}
+    \item \textbf{Pitfall}: Traverse tunnels, avoid pits
+    \item \textbf{Arms Dealer}: Collect and deliver weapons to locations
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Survival Scenarios:}
+\begin{itemize}
+    \item \textbf{Raise the Roof}: Find switches to prevent ceiling crush
+    \item \textbf{Health Gathering}: Collect health kits to survive
+\end{itemize}
+\end{columns}
+
+\vspace{0.5em}
+Each scenario has \textbf{default} and \textbf{hard} difficulty variants
+\end{frame}
+
+\begin{frame}{COOM Task Sequence Types}
+\textbf{Cross-Domain (CD):} Same objective, different visuals
+
+\begin{itemize}
+    \item Base: Run and Gun scenario
+    \item Modifications: wall textures, enemy types, obstacles, view height
+    \item Tests: visual generalization without goal change
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Cross-Objective (CO):} Different scenarios entirely
+
+\begin{itemize}
+    \item Sequence: Run and Gun $\rightarrow$ Chainsaw $\rightarrow$ Hide and Seek $\rightarrow$ Floor is Lava $\rightarrow$ ...
+    \item Goal changes drastically: eliminate $\rightarrow$ melee $\rightarrow$ evade $\rightarrow$ navigate
+    \item Tests: skill transfer across fundamentally different tasks
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Sequence Lengths:} 4-task, 8-task (core), 16-task (extended)
+\end{frame}
+
+\begin{frame}{COOM Evaluation Metrics}
+\textbf{1. Average Performance}
+\begin{equation}
+\bar{P} = \frac{1}{N} \sum_{i=1}^{N} P_i^{\text{final}}
+\end{equation}
+Success rate averaged over all N tasks at sequence end.
+
+\vspace{0.5em}
+\textbf{2. Forgetting}
+\begin{equation}
+F_i = P_i^{\text{after\_training\_i}} - P_i^{\text{end\_of\_sequence}}
+\end{equation}
+How much performance on task $i$ degrades after subsequent training.
+
+\vspace{0.5em}
+\textbf{3. Forward Transfer}
+\begin{equation}
+FT_i = \frac{\text{AUC}_{\text{continual}}}{\text{AUC}_{\text{scratch}}} - 1
+\end{equation}
+Training efficiency compared to learning from scratch.
+\end{frame}
+
+\begin{frame}{COOM Baseline Results}
+\begin{table}
+\footnotesize
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Method} & \textbf{AP $\uparrow$} & \textbf{FGT $\downarrow$} & \textbf{FWT $\uparrow$} \\
+\midrule
+Fine-tuning & 0.31 & 0.58 & -0.12 \\
+EWC & 0.35 & 0.51 & -0.08 \\
+PackNet & 0.42 & 0.24 & -0.15 \\
+\textbf{ClonEx-SAC} & \textbf{0.61} & \textbf{0.18} & \textbf{0.05} \\
+\bottomrule
+\end{tabular}
+\caption{Cross-Objective 8-task sequence}
+\end{table}
+
+\vspace{0.3em}
+\textbf{Key Observations:}
+\begin{itemize}
+    \item Even best method (ClonEx-SAC) shows \textbf{18\% forgetting}
+    \item Forward transfer is often \textbf{negative} (prior tasks hurt!)
+    \item Cross-objective sequences are significantly harder than cross-domain
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Continual RL: Open Challenges}
+\textbf{What Makes Continual RL Hard?}
+\begin{enumerate}
+    \item \textbf{Catastrophic Forgetting}: Neural nets overwrite old knowledge when learning new tasks
+    \item \textbf{Task Interference}: Skills for one objective may conflict with another
+    \item \textbf{No Clear Task Boundaries}: In deployment, agents don't know when tasks change
+    \item \textbf{Sample Efficiency}: Can't afford to retrain from scratch on each new task
+\end{enumerate}
+
+\vspace{0.5em}
+\textbf{Why World Models Might Help:}
+\begin{itemize}
+    \item Learned dynamics are more likely to transfer between tasks
+    \item Replay in imagination doesn't require real samples
+    \item Latent space can encode transferable features
+\end{itemize}
+
+\vspace{0.3em}
+\textbf{Open Problem:} No method achieves >65\% average performance with <15\% forgetting
+\end{frame}
+
+\begin{frame}{Connection to Our Work}
+\textbf{Our 2D Shooter vs COOM:}
+\begin{columns}
+\column{0.5\textwidth}
+\begin{itemize}
+    \item Multi-objective: survive + collect + eliminate
+    \item Visual observations (→ World Model VAE)
+    \item Continuous dynamics
+    \item Potential for scenario variations
+\end{itemize}
+
+\column{0.5\textwidth}
+\begin{itemize}
+    \item 8 COOM scenarios test diverse skills
+    \item ViZDoom visual observations
+    \item 3D navigation
+    \item Cross-domain and cross-objective sequences
+\end{itemize}
+\end{columns}
+
+\vspace{0.5em}
+\textbf{Future Work:} Apply COOM evaluation framework (AP, FGT, FWT) to test our agents' robustness to environment modifications
+\end{frame}
+
+% ==============================================================================
+% SECTION 3: MODEL-FREE RESULTS
+% ==============================================================================
+\section{Model-Free RL Results}
+
+\begin{frame}{Algorithm Comparison}
+\begin{columns}
+\column{0.45\textwidth}
+\textbf{Key Findings:}
+\begin{itemize}
+    \item \textbf{PPO} achieves best performance (+38.74)
+    \item \textbf{DQN} comparable but more variable
+    \item \textbf{SAC} significantly underperforms
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Why SAC Failed:}
+\begin{itemize}
+    \item Action space mismatch
+    \item 12x slower training speed
+    \item Entropy regularization interference
+\end{itemize}
+
+\column{0.55\textwidth}
+\centering
+\includegraphics[width=\textwidth]{algorithm_comparison.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Algorithm Comparison (Detailed)}
+\centering
+\includegraphics[width=0.85\textwidth]{algorithm_comparison.png}
+
+\vspace{0.5em}
+\textbf{PPO with aggressive rewards achieves +38.74} --- SAC underperforms due to action space mismatch
+\end{frame}
+
+\begin{frame}{Learning Curves: PPO}
+\centering
+\includegraphics[width=0.85\textwidth]{ppo_learning_curves.png}
+
+\vspace{0.5em}
+\textbf{PPO shows stable, monotonic improvement across all configurations}
+\end{frame}
+
+\begin{frame}{Learning Curves: DQN}
+\centering
+\includegraphics[width=0.85\textwidth]{dqn_learning_curves.png}
+
+\vspace{0.5em}
+\textbf{DQN shows reward decrease with survival config (sparse rewards)}
+\end{frame}
+
+\begin{frame}{Reward Shaping Impact}
+\begin{columns}
+\column{0.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{reward_ablation.png}
+
+\column{0.55\textwidth}
+\textbf{Reward design dominates algorithm choice!}
+
+\vspace{0.5em}
+\begin{table}
+\footnotesize
+\begin{tabular}{lccc}
+\toprule
+\textbf{Algo} & \textbf{Aggr} & \textbf{Base} & \textbf{Surv} \\
+\midrule
+PPO & \textbf{+38.74} & +21.96 & $-$8.80 \\
+DQN & +33.95 & +19.42 & $-$8.77 \\
+SAC & +1.49 & $-$5.02 & $-$13.73 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.5em}
+\textbf{Why Aggressive Works:}
+\begin{itemize}
+    \item Stronger positive signals
+    \item Reduced death penalty $\rightarrow$ exploration
+    \item Higher time penalty $\rightarrow$ active play
+\end{itemize}
+\end{columns}
+\end{frame}
+
+% ==============================================================================
+% SECTION 4: WORLD MODELS
+% ==============================================================================
+\section{World Models Approach}
+
+\begin{frame}{VAE Architecture (Full)}
+\centering
+\includegraphics[width=0.95\textwidth]{vae_architecture.pdf}
+
+\vspace{0.5em}
+\textbf{Encoder:} Conv2D (32$\rightarrow$64$\rightarrow$128$\rightarrow$256) $\rightarrow$ FC $\rightarrow$ $\mu$, $\sigma$ (32 dims each)\\
+\textbf{Decoder:} FC $\rightarrow$ ConvTranspose2D (256$\rightarrow$128$\rightarrow$64$\rightarrow$32$\rightarrow$3)\\
+\textbf{Loss:} BCE reconstruction + $\beta \cdot$ KL divergence
+\end{frame}
+
+\begin{frame}{VAE Reconstruction Quality}
+\centering
+\includegraphics[width=0.8\textwidth]{vae_reconstruction_grid.png}
+
+\vspace{0.3em}
+\textbf{Top row:} Original game frames | \textbf{Bottom row:} VAE reconstructions
+
+\vspace{0.3em}
+MSE: 0.00085 --- Entities, colors, and positions accurately preserved!
+\end{frame}
+
+\begin{frame}{World Models Architecture}
+\begin{columns}
+\column{0.5\textwidth}
+\textbf{Vision Model (VAE):}
+\begin{itemize}
+    \item Input: 64$\times$64 RGB frames
+    \item Output: 32-dim latent $z$
+    \item Loss: BCE + KL divergence
+\end{itemize}
+
+\vspace{0.3em}
+\textbf{Memory Model (MDN-RNN):}
+\begin{itemize}
+    \item LSTM with 256 hidden units
+    \item MDN output for $P(z_{t+1}|z_t, a_t)$
+    \item Predicts: reward, done
+\end{itemize}
+
+\vspace{0.3em}
+\textbf{Controller (PPO):}
+\begin{itemize}
+    \item Input: $[z_t, h_t]$ (288 dims)
+\end{itemize}
+
+\column{0.5\textwidth}
+\centering
+\includegraphics[width=0.9\textwidth]{mdn_rnn_clean.pdf}
+\end{columns}
+\end{frame}
+
+\begin{frame}{VAE: MSE vs BCE Loss}
+\begin{columns}
+\column{0.45\textwidth}
+\textbf{Problem with MSE:}
+\begin{itemize}
+    \item Blurry reconstructions
+    \item Washed-out colors
+    \item MSE $\approx$ 0.015
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Solution with BCE:}
+\begin{itemize}
+    \item Sharp reconstructions
+    \item Correct entity colors
+    \item \textbf{15$\times$ improvement}
+    \item MSE $\approx$ 0.001
+\end{itemize}
+
+\column{0.55\textwidth}
+\centering
+\includegraphics[width=\textwidth]{vae_reconstruction_grid.png}
+\small VAE Reconstruction with BCE Loss (MSE: 0.00085)
+\end{columns}
+\end{frame}
+
+\begin{frame}{Latent Space Properties}
+\centering
+\includegraphics[width=0.9\textwidth]{vae_latent_interpolation.png}
+
+\vspace{0.5em}
+\textbf{Smooth interpolation between game states} $\Rightarrow$ well-structured latent space
+
+\vspace{0.3em}
+$z_\alpha = (1-\alpha) \cdot z_{\text{start}} + \alpha \cdot z_{\text{end}}$
+\end{frame}
+
+\begin{frame}{MDN-RNN: Sigma Hacking Problem}
+\textbf{The Problem:}
+\begin{equation}
+-\log p(z | \mu, \sigma) = \frac{(z-\mu)^2}{2\sigma^2} + \log\sigma + \text{const}
+\end{equation}
+
+As $\sigma \rightarrow 0$ with $\mu \rightarrow z$, loss $\rightarrow -\infty$
+
+\vspace{0.5em}
+\begin{table}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Metric} & \textbf{Value} & \textbf{Status} \\
+\midrule
+Min sigma & 0.0012 & OK \\
+Latent MSE & 0.0016 & Good \\
+\textbf{Reward correlation} & \textbf{0.08} & \textcolor{red}{FAILED} \\
+Predicted rewards & $[-0.017, +0.034]$ & \textcolor{red}{Near-zero!} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Root cause:} Random policy data $\rightarrow$ sparse rewards $\rightarrow$ predict mean (zero)
+\end{frame}
+
+\begin{frame}{Training Approaches}
+\centering
+\begin{tabular}{l p{5cm} c}
+\toprule
+\textbf{Approach} & \textbf{Method} & \textbf{Real Reward} \\
+\midrule
+Pure Dream & Train on predicted rewards (MDN) & \textcolor{red}{$-$5.2 (Failed)} \\
+Hybrid & Real rewards + VAE observations & \textcolor{orange}{$-$2.9 (Poor)} \\
+\textbf{Dyna-Style} & \textbf{Interleaved Real + Dream} & \textbf{$-$4.9 (Best WM)} \\
+\bottomrule
+\end{tabular}
+
+\vspace{1em}
+\includegraphics[width=0.4\textwidth]{mdn_rnn_clean.pdf}
+
+\vspace{0.5em}
+\textbf{Conclusion:} Pure imagination fails due to "dream exploitation". \textbf{Dyna-style} with periodic real evaluation provides the most stable world model training.
+\end{frame}
+
+\begin{frame}{Dream Exploitation: A Critical Warning}
+\centering
+\includegraphics[width=0.9\textwidth]{approaches_summary.png}
+
+\vspace{0.5em}
+\textbf{Key Finding:} +74.3 in imagination $\rightarrow$ \textcolor{red}{-6.3 in reality}
+
+\vspace{0.3em}
+\small
+The agent learned to \textbf{exploit MDN-RNN prediction errors} rather than genuine game skills.
+This is why periodic real-world evaluation is essential!
+\end{frame}
+
+\begin{frame}{World Model: Lessons Learned}
+\textbf{Why World Models Underperformed Here:}
+\begin{enumerate}
+    \item \textbf{Information Bottleneck}: VAE compresses $64\times64\times3 \rightarrow 32$ dims, losing precise values
+    \item \textbf{Useless Hidden State}: MDN-RNN trained on random data = 256 dims of noise
+    \item \textbf{Dream Exploitation}: Agent finds adversarial actions that maximize predicted (not real) rewards
+    \item \textbf{Wrong Use Case}: Environment already provides structured state---no need for vision
+\end{enumerate}
+
+\vspace{0.5em}
+\textbf{When World Models Excel:}
+\begin{itemize}
+    \item Pixel-only observations (Atari, DMC)
+    \item Sample efficiency critical (expensive simulators)
+    \item Complex dynamics requiring prediction
+\end{itemize}
+\end{frame}
+
+% ==============================================================================
+% SECTION 5: CONCLUSION
+% ==============================================================================
+\section{Conclusion}
+
+\begin{frame}{Summary}
+\textbf{Model-Free RL:}
+\begin{itemize}
+    \item PPO with aggressive rewards: \textbf{+38.74} (best overall)
+    \item Reward shaping $>$ algorithm choice
+    \item SAC struggles with discrete actions (12x slower)
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{World Models:}
+\begin{itemize}
+    \item VAE with BCE: excellent visual reconstruction (MSE 0.001)
+    \item \textcolor{red}{Dream Exploitation}: +74 in imagination $\rightarrow$ -6.3 in reality
+    \item Dyna-style fixes exploitation but limited by information loss
+    \item Best WM result: \textbf{-5.18} (vs +38.74 model-free)
+\end{itemize}
+
+\vspace{0.5em}
+\textbf{Key Insight:} World Models shine for pixel-only envs; structured state $\rightarrow$ model-free wins
+\end{frame}
+
+\begin{frame}{Future Work}
+\begin{enumerate}
+    \item \textbf{State-based World Model}: Learn dynamics on structured state, not pixels
+    \item \textbf{DreamerV3 Implementation}: Symlog rewards, ensemble disagreement
+    \item \textbf{Shorter Imagination Horizons}: 15-50 steps instead of 500
+    \item \textbf{COOM-style Continual Learning}: Test catastrophic forgetting
+    \item \textbf{Sample Efficiency Study}: Compare wall-clock time to performance
+\end{enumerate}
+
+\vspace{1em}
+\centering
+\textbf{Thank you! Questions?}
+\end{frame}
+
+% ==============================================================================
+% REFERENCES
+% ==============================================================================
+\begin{frame}{References}
+\footnotesize
+\begin{itemize}
+    \item Tomilin et al., ``COOM: A Game Benchmark for Continual RL,'' NeurIPS 2023
+    \item Ha \& Schmidhuber, ``World Models,'' arXiv 2018
+    \item Hafner et al., ``Mastering Atari with Discrete World Models,'' ICLR 2021
+    \item Schulman et al., ``Proximal Policy Optimization,'' arXiv 2017
+\end{itemize}
+\end{frame}
+
+\end{document}

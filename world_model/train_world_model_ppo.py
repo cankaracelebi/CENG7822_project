@@ -229,6 +229,10 @@ class WorldModelMetricsCallback(BaseCallback):
 # TRAINING FUNCTIONS
 # ==============================================================================
 
+from tqdm import tqdm
+
+# ... (imports)
+
 def train_vae(vae, dataloader, epochs, lr, beta, device, log_dir):
     """Train VAE on frames with logging."""
     vae = vae.to(device)
@@ -244,7 +248,8 @@ def train_vae(vae, dataloader, epochs, lr, beta, device, log_dir):
         epoch_loss, epoch_recon, epoch_kl = 0, 0, 0
         n_batches = 0
         
-        for batch in dataloader:
+        pbar = tqdm(dataloader, desc=f"VAE Epoch {epoch+1}/{epochs}")
+        for batch in pbar:
             frames = batch[0].to(device)
             optimizer.zero_grad()
             recon, mu, logvar = vae(frames)
@@ -255,6 +260,8 @@ def train_vae(vae, dataloader, epochs, lr, beta, device, log_dir):
             epoch_recon += metrics['recon_loss']
             epoch_kl += metrics['kl_loss']
             n_batches += 1
+            
+            pbar.set_postfix({'loss': loss.item()})
         
         avg_loss = epoch_loss / n_batches
         avg_recon = epoch_recon / n_batches
@@ -264,16 +271,20 @@ def train_vae(vae, dataloader, epochs, lr, beta, device, log_dir):
             writer = csv.writer(f)
             writer.writerow([epoch + 1, avg_loss, avg_recon, avg_kl])
         
-        if (epoch + 1) % 10 == 0:
-            print(f"VAE Epoch {epoch+1}/{epochs}: Loss={avg_loss:.4f}, Recon={avg_recon:.4f}, KL={avg_kl:.4f}")
+        print(f"VAE Epoch {epoch+1}/{epochs}: Loss={avg_loss:.4f}, Recon={avg_recon:.4f}, KL={avg_kl:.4f}")
     
     return vae
 
 
 def train_mdn_rnn(mdn_rnn, vae, frames, actions, rewards, dones, 
-                  seq_len, epochs, batch_size, lr, device, log_dir):
-    """Train MDN-RNN on latent sequences with logging."""
+                  seq_len, epochs, batch_size, lr, device, log_dir, reward_weight=1.0):
+    """Train MDN-RNN on latent sequences with logging.
+    
+    Args:
+        reward_weight: Weight for reward loss (higher = better reward prediction).
+    """
     mdn_rnn = mdn_rnn.to(device)
+    mdn_rnn.reward_weight = reward_weight  # Pass to loss function
     vae = vae.to(device)
     vae.eval()
     optimizer = optim.Adam(mdn_rnn.parameters(), lr=lr)
@@ -288,19 +299,75 @@ def train_mdn_rnn(mdn_rnn, vae, frames, actions, rewards, dones,
         frames_t = torch.tensor(frames, dtype=torch.float32, device=device)
         frames_t = frames_t.permute(0, 3, 1, 2)  # (N, C, H, W)
         latents = []
-        for i in range(0, len(frames_t), 128):
+        # Tqdm for encoding
+        for i in tqdm(range(0, len(frames_t), 128), desc="Encoding"):
             z = vae.encode(frames_t[i:i+128], deterministic=True)
             latents.append(z.cpu())
         latents = torch.cat(latents, dim=0).numpy()
     
     print(f"Latent shape: {latents.shape}")
     
-    n_seq = len(latents) - seq_len
-    z_seqs = np.array([latents[i:i+seq_len] for i in range(n_seq)])
-    a_seqs = np.array([actions[i:i+seq_len] for i in range(n_seq)])
-    r_seqs = np.array([rewards[i:i+seq_len] for i in range(n_seq)])
-    d_seqs = np.array([dones[i:i+seq_len] for i in range(n_seq)])
-    z_next = np.array([latents[i+1:i+1+seq_len] for i in range(n_seq)])
+    # Prepare sequences for MDN-RNN training
+    n_frames = len(latents)
+    z_seqs = []
+    a_seqs = []
+    r_seqs = []
+    d_seqs = []
+    z_next = []
+    
+    # Find episode boundaries
+    episode_starts = [0]
+    for i in range(len(dones)):
+        if dones[i]:
+            if i + 1 < n_frames:
+                episode_starts.append(i + 1)
+    episode_starts.append(n_frames)
+    
+    # Create sequences within episodes
+    for ep_idx in range(len(episode_starts) - 1):
+        start = episode_starts[ep_idx]
+        end = episode_starts[ep_idx + 1]
+        ep_len = end - start
+        
+        if ep_len <= seq_len:
+            continue
+            
+        for i in range(start, end - seq_len):
+            z_seqs.append(latents[i:i+seq_len])
+            a_seqs.append(actions[i:i+seq_len])
+            r_seqs.append(rewards[i:i+seq_len])
+            d_seqs.append(dones[i:i+seq_len].astype(np.float32))
+            z_next.append(latents[i+1:i+seq_len+1])
+    
+    z_seqs = np.array(z_seqs)
+    a_seqs = np.array(a_seqs)
+    r_seqs = np.array(r_seqs)
+    d_seqs = np.array(d_seqs)
+    z_next = np.array(z_next)
+    
+    print(f"Created {len(z_seqs)} training sequences of length {seq_len}")
+    
+    if len(z_seqs) == 0:
+        print("Warning: No valid sequences created! Reducing sequence length...")
+        seq_len = min(8, n_frames // 10)
+        for ep_idx in range(len(episode_starts) - 1):
+            start = episode_starts[ep_idx]
+            end = episode_starts[ep_idx + 1]
+            ep_len = end - start
+            if ep_len <= seq_len:
+                continue
+            for i in range(start, end - seq_len):
+                z_seqs.append(latents[i:i+seq_len])
+                a_seqs.append(actions[i:i+seq_len])
+                r_seqs.append(rewards[i:i+seq_len])
+                d_seqs.append(dones[i:i+seq_len].astype(np.float32))
+                z_next.append(latents[i+1:i+seq_len+1])
+        z_seqs = np.array(z_seqs)
+        a_seqs = np.array(a_seqs)
+        r_seqs = np.array(r_seqs)
+        d_seqs = np.array(d_seqs)
+        z_next = np.array(z_next)
+        print(f"Created {len(z_seqs)} training sequences of length {seq_len}")
     
     dataset = TensorDataset(
         torch.tensor(z_seqs, dtype=torch.float32),
@@ -316,7 +383,8 @@ def train_mdn_rnn(mdn_rnn, vae, frames, actions, rewards, dones,
         epoch_mdn, epoch_total = 0, 0
         n_batches = 0
         
-        for z_seq, a_seq, r_seq, d_seq, z_next_seq in loader:
+        pbar = tqdm(loader, desc=f"MDN Epoch {epoch+1}/{epochs}")
+        for z_seq, a_seq, r_seq, d_seq, z_next_seq in pbar:
             z_seq, a_seq = z_seq.to(device), a_seq.to(device)
             r_seq, d_seq = r_seq.to(device), d_seq.to(device)
             z_next_seq = z_next_seq.to(device)
@@ -329,13 +397,13 @@ def train_mdn_rnn(mdn_rnn, vae, frames, actions, rewards, dones,
             epoch_mdn += metrics['mdn_loss']
             epoch_total += metrics['total_loss']
             n_batches += 1
+            pbar.set_postfix({'loss': loss.item()})
         
         with open(csv_path, 'a', newline='') as f:
             writer = csv.writer(f)
             writer.writerow([epoch + 1, epoch_mdn / n_batches, epoch_total / n_batches])
         
-        if (epoch + 1) % 10 == 0:
-            print(f"MDN-RNN Epoch {epoch+1}/{epochs}: Loss={epoch_total/n_batches:.4f}")
+        print(f"MDN-RNN Epoch {epoch+1}/{epochs}: Loss={epoch_total/n_batches:.4f}")
     
     return mdn_rnn
 
@@ -427,22 +495,29 @@ def evaluate_with_video(model, vae, mdn_rnn, real_env, n_episodes, video_dir, de
 
 def main():
     parser = argparse.ArgumentParser(description="Train World Model with PPO Controller")
-    parser.add_argument("--collect-frames", type=int, default=20000)
-    parser.add_argument("--n-episodes", type=int, default=200)
+    parser.add_argument("--collect-frames", type=int, default=25000)  # Reduced to 25k for speed
+    parser.add_argument("--n-episodes", type=int, default=500)
     parser.add_argument("--vae-epochs", type=int, default=50)
-    parser.add_argument("--mdn-epochs", type=int, default=50)
-    parser.add_argument("--ppo-timesteps", type=int, default=100000)
+    parser.add_argument("--mdn-epochs", type=int, default=50)  # Back to 50 epochs
+    parser.add_argument("--ppo-timesteps", type=int, default=1000000)  # Long regime: 1M steps
     parser.add_argument("--latent-dim", type=int, default=32)
     parser.add_argument("--hidden-dim", type=int, default=256)
     parser.add_argument("--batch-size", type=int, default=64)
-    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--lr", type=float, default=3e-4)  # Lower LR for stability
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
-    parser.add_argument("--save-dir", type=str, default="./world_model_agent")
+    parser.add_argument("--save-dir", type=str, default="./world_model_agent_long")
     parser.add_argument("--skip-collect", action="store_true")
     parser.add_argument("--skip-vae", action="store_true")
     parser.add_argument("--skip-mdn", action="store_true")
     parser.add_argument("--use-real-env", action="store_true")
-    parser.add_argument("--eval-videos", type=int, default=5, help="Number of evaluation videos")
+    parser.add_argument("--eval-videos", type=int, default=5)
+    # MDN-RNN improvement options
+    parser.add_argument("--normalize-rewards", action="store_true", help="Normalize rewards before MDN-RNN training")
+    parser.add_argument("--reward-weight", type=float, default=1.0, help="Weight for reward loss in MDN-RNN (higher = better reward prediction)")
+    parser.add_argument("--collect-policy", type=str, default=None, help="Path to trained policy for data collection (instead of random)")
+    # External model paths (to load pre-trained models from different directories)
+    parser.add_argument("--vae-path", type=str, default=None, help="Path to pre-trained VAE (overrides save-dir/vae.pt)")
+    parser.add_argument("--mdn-path", type=str, default=None, help="Path to pre-trained MDN-RNN (overrides save-dir/mdn_rnn.pt)")
     args = parser.parse_args()
     
     os.makedirs(args.save_dir, exist_ok=True)
@@ -451,22 +526,32 @@ def main():
     os.makedirs(log_dir, exist_ok=True)
     
     print("="*70)
-    print("World Model Training with PPO Controller")
+    print("World Model Training with PPO Controller (Long Regime)")
     print("="*70)
     print(f"Device: {args.device}")
-    print(f"Save directory: {args.save_dir}")
-    print(f"Log directory: {log_dir}")
+    print(f"PPO Timesteps: {args.ppo_timesteps}")
+    print(f"Collect Frames: {args.collect_frames}")
     
     real_env = ShooterEnv(render_mode="rgb_array")
     action_dim = int(np.prod(real_env.action_space.nvec))
     
     # ==== Step 1: Collect Data ====
-    print("\n=== Step 1: Collect Data ===")
+    if args.collect_policy:
+        print(f"\n=== Step 1: Collect Data (Trained Policy: {args.collect_policy}) ===")
+    else:
+        print("\n=== Step 1: Collect Data (Random Policy) ===")
+    
     collector = FrameDataCollector(save_dir=args.save_dir, frame_size=(64,64), max_frames=args.collect_frames)
     
     if args.skip_collect and os.path.exists(os.path.join(args.save_dir, "collected_data.npz")):
         print("Loading existing data...")
         collector.load("collected_data.npz")
+    elif args.collect_policy:
+        # Use trained policy for data collection (better reward coverage)
+        from stable_baselines3 import PPO as SB3PPO
+        policy = SB3PPO.load(args.collect_policy)
+        collector.collect_with_policy(real_env, policy, args.n_episodes, 500, verbose=True)
+        collector.save("collected_data.npz")
     else:
         collector.collect_random_episodes(real_env, args.n_episodes, 500, verbose=True)
         collector.save("collected_data.npz")
@@ -476,12 +561,20 @@ def main():
     # ==== Step 2: Train VAE ====
     print("\n=== Step 2: Train VAE ===")
     vae = VAE(in_channels=3, latent_dim=args.latent_dim)
-    vae_path = os.path.join(args.save_dir, "vae.pt")
     
-    if args.skip_vae and os.path.exists(vae_path):
+    # Check for external VAE path first, then save_dir
+    if args.vae_path and os.path.exists(args.vae_path):
+        vae.load_state_dict(torch.load(args.vae_path, map_location=args.device))
+        print(f"Loaded VAE from: {args.vae_path}")
+        # Copy to save_dir for future use
+        vae_path = os.path.join(args.save_dir, "vae.pt")
+        torch.save(vae.state_dict(), vae_path)
+    elif args.skip_vae and os.path.exists(os.path.join(args.save_dir, "vae.pt")):
+        vae_path = os.path.join(args.save_dir, "vae.pt")
         vae.load_state_dict(torch.load(vae_path, map_location=args.device))
-        print("Loaded existing VAE")
+        print("Loaded existing VAE from save_dir")
     else:
+        vae_path = os.path.join(args.save_dir, "vae.pt")
         vae_dataset = collector.get_vae_dataset()
         vae_loader = DataLoader(vae_dataset, batch_size=args.batch_size, shuffle=True)
         vae = train_vae(vae, vae_loader, args.vae_epochs, args.lr, 1.0, args.device, log_dir)
@@ -498,6 +591,14 @@ def main():
     else:
         frames = np.array(collector.frames)
         actions_raw = np.array(collector.actions)
+        rewards = np.array(collector.rewards)
+        
+        # Reward normalization (improves MDN-RNN reward prediction)
+        if args.normalize_rewards:
+            reward_mean = rewards.mean()
+            reward_std = rewards.std() + 1e-8
+            rewards = (rewards - reward_mean) / reward_std
+            print(f"Normalized rewards: mean={reward_mean:.4f}, std={reward_std:.4f}")
         
         actions = np.zeros((len(actions_raw), action_dim), dtype=np.float32)
         for i, a in enumerate(actions_raw):
@@ -506,8 +607,9 @@ def main():
         
         mdn_rnn = train_mdn_rnn(
             mdn_rnn, vae, frames, actions,
-            np.array(collector.rewards), np.array(collector.dones),
-            32, args.mdn_epochs, args.batch_size, args.lr, args.device, log_dir
+            rewards, np.array(collector.dones),
+            32, args.mdn_epochs, args.batch_size, args.lr, args.device, log_dir,
+            reward_weight=args.reward_weight
         )
         torch.save(mdn_rnn.state_dict(), mdn_path)
     

@@ -1,27 +1,12 @@
-# Python dependencies for CENG7822 RL Project
 
-# Core RL dependencies
 gymnasium>=0.29.0
 numpy>=1.24.0
 stable-baselines3>=2.0.0
-
-# Game rendering (Arcade instead of pygame)
 arcade>=2.6.17
-
-# Monitoring and logging
 tensorboard>=2.13.0
 matplotlib>=3.7.0
-
-# Video recording and progress
 moviepy>=2.0.0
 rich>=13.0.0
 tqdm>=4.65.0
-
-# Deep learning
 torch>=2.0.0
-
-# Image processing
 opencv-python>=4.8.0
-
-# CMA-ES for world model controller training
-cma>=3.0.0

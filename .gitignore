@@ -31,11 +31,17 @@ models/
 logs/
 tensorboard_logs/
 *.pkl
-*.zip
+
+# Trained model checkpoints (large files)
+world_model_agent/
+world_model_agent_long/
+world_model_agent_real/
+world_model_agent_real_v2/
+world_model_checkpoints/
+experiments/
 
 # Backup files
 *.backup
-game.py.backup
 
 # IDE
 .vscode/
@@ -58,12 +64,25 @@ htmlcov/
 # Temporary files
 *.log
 *.tmp
-test_*.py
 
-# Video recordings (if you record episodes)
+# Video recordings
 *.mp4
 *.avi
 *.gif
 
 # Conda
 *.conda
+
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.out
+*.toc
+*.nav
+*.snm
+*.vrb
+

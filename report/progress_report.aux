@@ -16,55 +16,124 @@
 \gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{mnih2015dqn}
+\citation{kempka2016vizdoom}
+\citation{lample2017playing}
+\citation{juliani2018unity}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {2}Environment Description}{1}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}State Space Representation}{1}{subsection.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Action Space Design}{2}{subsection.2.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Reward Shaping Configurations}{2}{subsection.2.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Reward Configuration Parameters. Positive values encourage the corresponding behavior, while negative values (shown as penalties) discourage them.\relax }}{2}{table.caption.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {2}Literature Survey}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Deep RL in Arcade Games}{1}{subsection.2.1}\protected@file@percent }
+\citation{ng1999policy}
+\citation{garcia2015safe}
+\citation{cobbe2019generalization}
+\citation{tobin2017domain}
+\citation{worldmodels}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}3D Shooter Environments}{2}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Reward Shaping Theory}{2}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Safe Reinforcement Learning}{2}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Generalization in RL}{2}{subsection.2.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}World Models and Model-Based RL}{2}{subsection.2.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.1}The Original World Models Framework}{2}{subsubsection.2.6.1}\protected@file@percent }
+\citation{dreamerv1}
+\citation{dreamerv2}
+\citation{dreamerv3}
+\citation{coom}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.2}Dreamer Series: Evolution of World Models}{3}{subsubsection.2.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.3}COOM: A Benchmark for Continual Reinforcement Learning}{3}{subsubsection.2.6.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces COOM Baseline Performance on Cross-Objective 8-task Sequence\relax }}{4}{table.caption.1}\protected@file@percent }
 \providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
-\newlabel{tab:reward-config}{{1}{2}{Reward Configuration Parameters. Positive values encourage the corresponding behavior, while negative values (shown as penalties) discourage them.\relax }{table.caption.1}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Experimental Setup}{2}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Algorithm Selection and Implementation}{2}{subsection.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Training Duration Configurations}{3}{subsection.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4}Experimental Results}{3}{section.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Learning Curve Analysis}{3}{subsection.4.1}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces DQN Learning Curves. The three panels show performance under baseline, survival, and aggressive reward configurations. Each curve represents a different training duration (short: 50k, medium: 500k, long: 1.6M timesteps).\relax }}{3}{figure.caption.2}\protected@file@percent }
-\newlabel{fig:dqn-curves}{{1}{3}{DQN Learning Curves. The three panels show performance under baseline, survival, and aggressive reward configurations. Each curve represents a different training duration (short: 50k, medium: 500k, long: 1.6M timesteps).\relax }{figure.caption.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces PPO Learning Curves. PPO exhibits smooth, monotonic improvement across all configurations. The aggressive reward configuration with 1.6M timesteps achieves the highest performance.\relax }}{4}{figure.caption.3}\protected@file@percent }
-\newlabel{fig:ppo-curves}{{2}{4}{PPO Learning Curves. PPO exhibits smooth, monotonic improvement across all configurations. The aggressive reward configuration with 1.6M timesteps achieves the highest performance.\relax }{figure.caption.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces SAC Learning Curves. SAC shows slower improvement rates compared to other algorithms, with the aggressive configuration still outperforming alternatives.\relax }}{4}{figure.caption.4}\protected@file@percent }
-\newlabel{fig:sac-curves}{{3}{4}{SAC Learning Curves. SAC shows slower improvement rates compared to other algorithms, with the aggressive configuration still outperforming alternatives.\relax }{figure.caption.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Algorithm Comparison}{4}{subsection.4.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Algorithm Comparison at 500k timesteps. DQN (blue) and PPO (green) achieve similar performance across configurations, with both outperforming SAC (red).\relax }}{4}{figure.caption.5}\protected@file@percent }
-\newlabel{fig:algo-compare}{{4}{4}{Algorithm Comparison at 500k timesteps. DQN (blue) and PPO (green) achieve similar performance across configurations, with both outperforming SAC (red).\relax }{figure.caption.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Summary Statistics}{5}{subsection.4.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Final Performance Across All Configurations (Mean $\pm $ Std over final 10\% of episodes)\relax }}{5}{table.caption.6}\protected@file@percent }
-\newlabel{tab:results}{{2}{5}{Final Performance Across All Configurations (Mean $\pm $ Std over final 10\% of episodes)\relax }{table.caption.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Ablation Study: Effect of Reward Shaping}{5}{section.5}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Reward Shaping Ablation Study. The aggressive configuration (right) consistently achieves the highest performance across all algorithms.\relax }}{6}{figure.caption.7}\protected@file@percent }
-\newlabel{fig:ablation}{{5}{6}{Reward Shaping Ablation Study. The aggressive configuration (right) consistently achieves the highest performance across all algorithms.\relax }{figure.caption.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Why Aggressive Rewards Work Best}{6}{subsection.5.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Why Survival Rewards Struggle}{6}{subsection.5.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {6}World Model Implementation}{6}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}VAE Architecture}{7}{subsection.6.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Dynamics Model}{7}{subsection.6.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}Training Results}{7}{subsection.6.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces VAE Reconstruction Results. Top row: original game frames. Bottom row: reconstructed frames from the 32-dimensional latent encoding. Reconstruction MSE = 0.0016.\relax }}{7}{figure.caption.8}\protected@file@percent }
-\newlabel{fig:vae-recon}{{6}{7}{VAE Reconstruction Results. Top row: original game frames. Bottom row: reconstructed frames from the 32-dimensional latent encoding. Reconstruction MSE = 0.0016.\relax }{figure.caption.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.4}Latent Space Properties}{7}{subsection.6.4}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Latent Space Interpolation. Smooth transition between two game states by linearly interpolating their latent representations demonstrates the learned latent space is geometrically meaningful.\relax }}{8}{figure.caption.9}\protected@file@percent }
-\newlabel{fig:vae-interp}{{7}{8}{Latent Space Interpolation. Smooth transition between two game states by linearly interpolating their latent representations demonstrates the learned latent space is geometrically meaningful.\relax }{figure.caption.9}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Analysis of SAC Performance Failure}{8}{section.7}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Action Space Mismatch}{8}{subsection.7.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Training Speed Penalty}{8}{subsection.7.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Entropy Regularization Interference}{8}{subsection.7.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Episode Length Observations}{8}{subsection.7.4}\protected@file@percent }
+\newlabel{tab:coom-baselines}{{1}{4}{COOM Baseline Performance on Cross-Objective 8-task Sequence\relax }{table.caption.1}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.6.4}Training World Models: Key Considerations}{5}{subsubsection.2.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Environment Description}{5}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}State Space Representation}{5}{subsection.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Action Space Design}{6}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Reward Shaping Configurations}{6}{subsection.3.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Reward Configuration Parameters. Positive values encourage behavior; negative values discourage. Each component provides a signal at the corresponding event during gameplay.\relax }}{6}{table.caption.2}\protected@file@percent }
+\newlabel{tab:reward-config}{{2}{6}{Reward Configuration Parameters. Positive values encourage behavior; negative values discourage. Each component provides a signal at the corresponding event during gameplay.\relax }{table.caption.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Experimental Setup}{6}{section.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Algorithm Selection and Implementation}{6}{subsection.4.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Training Duration Configurations}{7}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {5}Experimental Results}{7}{section.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Learning Curve Analysis}{7}{subsection.5.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces DQN Learning Curves across reward configurations. X-axis: training timesteps (0--1.6M). Y-axis: episode reward. Each panel shows a different reward configuration (baseline, survival, aggressive). Curves represent different training durations. The survival configuration shows reward decrease due to sparse positive signals and heavy penalties.\relax }}{7}{figure.caption.3}\protected@file@percent }
+\newlabel{fig:dqn-curves}{{1}{7}{DQN Learning Curves across reward configurations. X-axis: training timesteps (0--1.6M). Y-axis: episode reward. Each panel shows a different reward configuration (baseline, survival, aggressive). Curves represent different training durations. The survival configuration shows reward decrease due to sparse positive signals and heavy penalties.\relax }{figure.caption.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces PPO Learning Curves. X-axis: training timesteps (0--1.6M). Y-axis: episode reward. PPO exhibits smooth, monotonic improvement across all configurations due to its clipped objective preventing catastrophic policy updates. The aggressive configuration with 1.6M timesteps achieves the highest performance.\relax }}{8}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:ppo-curves}{{2}{8}{PPO Learning Curves. X-axis: training timesteps (0--1.6M). Y-axis: episode reward. PPO exhibits smooth, monotonic improvement across all configurations due to its clipped objective preventing catastrophic policy updates. The aggressive configuration with 1.6M timesteps achieves the highest performance.\relax }{figure.caption.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces SAC Learning Curves. X-axis: training timesteps (0--1.6M). Y-axis: episode reward. SAC shows slower improvement rates compared to other algorithms due to action space mismatch and entropy regularization. The aggressive configuration still outperforms survival, demonstrating reward shaping's universal importance.\relax }}{8}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:sac-curves}{{3}{8}{SAC Learning Curves. X-axis: training timesteps (0--1.6M). Y-axis: episode reward. SAC shows slower improvement rates compared to other algorithms due to action space mismatch and entropy regularization. The aggressive configuration still outperforms survival, demonstrating reward shaping's universal importance.\relax }{figure.caption.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Algorithm Comparison}{8}{subsection.5.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Algorithm Comparison at 500k timesteps. X-axis: reward configuration (baseline, survival, aggressive). Y-axis: mean episode reward. Bars represent DQN (blue), PPO (green), and SAC (red). Error bars show $\pm 1$ standard deviation. DQN and PPO achieve similar performance, with both significantly outperforming SAC across all configurations.\relax }}{9}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:algo-compare}{{4}{9}{Algorithm Comparison at 500k timesteps. X-axis: reward configuration (baseline, survival, aggressive). Y-axis: mean episode reward. Bars represent DQN (blue), PPO (green), and SAC (red). Error bars show $\pm 1$ standard deviation. DQN and PPO achieve similar performance, with both significantly outperforming SAC across all configurations.\relax }{figure.caption.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Summary Statistics and Discussion}{9}{subsection.5.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Final Performance Across All Configurations (Mean $\pm $ Std over final 10\% of episodes). High standard deviations reflect the stochastic nature of individual episodes---enemy spawns, prize locations, and combat outcomes vary significantly between runs.\relax }}{9}{table.caption.7}\protected@file@percent }
+\newlabel{tab:results}{{3}{9}{Final Performance Across All Configurations (Mean $\pm $ Std over final 10\% of episodes). High standard deviations reflect the stochastic nature of individual episodes---enemy spawns, prize locations, and combat outcomes vary significantly between runs.\relax }{table.caption.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Ablation Study: Effect of Reward Shaping}{10}{section.6}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Reward Shaping Ablation Study. X-axis: algorithm (DQN, PPO, SAC). Y-axis: mean episode reward at 500k timesteps. Bars grouped by reward configuration: baseline (blue), survival (orange), aggressive (green). The aggressive configuration consistently achieves the highest performance across all algorithms, demonstrating that reward design dominates algorithm choice.\relax }}{10}{figure.caption.8}\protected@file@percent }
+\newlabel{fig:ablation}{{5}{10}{Reward Shaping Ablation Study. X-axis: algorithm (DQN, PPO, SAC). Y-axis: mean episode reward at 500k timesteps. Bars grouped by reward configuration: baseline (blue), survival (orange), aggressive (green). The aggressive configuration consistently achieves the highest performance across all algorithms, demonstrating that reward design dominates algorithm choice.\relax }{figure.caption.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Why Aggressive Rewards Work Best}{10}{subsection.6.1}\protected@file@percent }
+\citation{worldmodels}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Why Survival Rewards Struggle}{11}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.3}DQN Reward Decrease Phenomenon}{11}{subsection.6.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {7}World Model Implementation}{11}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}VAE Architecture}{11}{subsection.7.1}\protected@file@percent }
+\citation{worldmodels}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces VAE Architecture. The encoder progressively reduces spatial dimensions through four convolutional layers (yellow) from $64\times 64\times 3$ to $4\times 4\times 256$, then projects to $\mu $ and $\sigma $ parameters (red/blue) for the 32-dimensional latent code $z$ (green). The decoder mirrors this structure using transposed convolutions (blue) to reconstruct the original image.\relax }}{12}{figure.caption.9}\protected@file@percent }
+\newlabel{fig:vae-arch}{{6}{12}{VAE Architecture. The encoder progressively reduces spatial dimensions through four convolutional layers (yellow) from $64\times 64\times 3$ to $4\times 4\times 256$, then projects to $\mu $ and $\sigma $ parameters (red/blue) for the 32-dimensional latent code $z$ (green). The decoder mirrors this structure using transposed convolutions (blue) to reconstruct the original image.\relax }{figure.caption.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}VAE Loss Function}{12}{subsection.7.2}\protected@file@percent }
+\newlabel{subsec:vae-loss}{{7.2}{12}{VAE Loss Function}{subsection.7.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.2.1}Reconstruction Loss: MSE vs BCE}{12}{subsubsection.7.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}MDN-RNN Dynamics Model}{13}{subsection.7.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces MDN-RNN Architecture. The latent state $z_t$ (32-dim) and action $a_t$ (80-dim) are concatenated and processed by an LSTM (256 hidden units). The MDN head outputs mixture weights $\boldsymbol  {\pi }$ (5 components), means $\boldsymbol  {\mu }$, and standard deviations $\boldsymbol  {\sigma }$ for next-state prediction. Auxiliary heads predict reward $\hat  {r}$ and episode termination $\hat  {d}$. Hidden states $h_t$ and $c_t$ maintain temporal context.\relax }}{13}{figure.caption.10}\protected@file@percent }
+\newlabel{fig:mdn-rnn-arch}{{7}{13}{MDN-RNN Architecture. The latent state $z_t$ (32-dim) and action $a_t$ (80-dim) are concatenated and processed by an LSTM (256 hidden units). The MDN head outputs mixture weights $\boldsymbol {\pi }$ (5 components), means $\boldsymbol {\mu }$, and standard deviations $\boldsymbol {\sigma }$ for next-state prediction. Auxiliary heads predict reward $\hat {r}$ and episode termination $\hat {d}$. Hidden states $h_t$ and $c_t$ maintain temporal context.\relax }{figure.caption.10}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Training Results}{13}{subsection.7.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces VAE Reconstruction Results with BCE Loss. Top row: original game frames sampled across different game states. Bottom row: reconstructed frames from the 32-dimensional latent encoding. The VAE successfully preserves entity positions, colors, and sharp boundaries. Reconstruction MSE: 0.00085.\relax }}{14}{figure.caption.11}\protected@file@percent }
+\newlabel{fig:vae-recon}{{8}{14}{VAE Reconstruction Results with BCE Loss. Top row: original game frames sampled across different game states. Bottom row: reconstructed frames from the 32-dimensional latent encoding. The VAE successfully preserves entity positions, colors, and sharp boundaries. Reconstruction MSE: 0.00085.\relax }{figure.caption.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}Latent Space Properties}{14}{subsection.7.5}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Latent Space Interpolation (BCE-trained VAE). Linear interpolation between two game states produces semantically meaningful intermediate frames. Start and End show actual game states; intermediate images ($\alpha = 0.14$ to $\alpha = 0.86$) are decoded from interpolated latent vectors. Smooth transitions indicate a well-structured latent manifold suitable for dynamics modeling.\relax }}{14}{figure.caption.12}\protected@file@percent }
+\newlabel{fig:vae-interp}{{9}{14}{Latent Space Interpolation (BCE-trained VAE). Linear interpolation between two game states produces semantically meaningful intermediate frames. Start and End show actual game states; intermediate images ($\alpha = 0.14$ to $\alpha = 0.86$) are decoded from interpolated latent vectors. Smooth transitions indicate a well-structured latent manifold suitable for dynamics modeling.\relax }{figure.caption.12}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}Comparison to DreamerV2}{14}{subsection.7.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Architectural Comparison between our implementation and DreamerV2. Our staged approach trades end-to-end optimization for clearer debugging and component validation.\relax }}{15}{table.caption.13}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.7}MDN-RNN Training Challenges: Reward Prediction and Sigma Collapse}{15}{subsection.7.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.7.1}The Sigma Hacking Problem}{15}{subsubsection.7.7.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {7.7.2}Reward Prediction Failure}{15}{subsubsection.7.7.2}\protected@file@percent }
+\citation{sutton1991dyna}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.8}Approach 1: Initial Pure Dream Training (Failed)}{16}{subsection.7.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.9}Training Approaches and Results}{16}{subsection.7.9}\protected@file@percent }
+\newlabel{subsec:wm-approaches}{{7.9}{16}{Training Approaches and Results}{subsection.7.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{\ignorespaces Summary of World Model Training Approaches\relax }}{16}{table.caption.14}\protected@file@percent }
+\newlabel{tab:wm-summary}{{5}{16}{Summary of World Model Training Approaches\relax }{table.caption.14}{}}
+\@writefile{toc}{\contentsline {paragraph}{1. Pure Dream Training:}{16}{section*.15}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{2. Hybrid Method (Workaround):}{16}{section*.16}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{3. Dream Exploitation:}{16}{section*.17}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{4. Dyna-Style Training (Best):}{16}{section*.18}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.10}Comprehensive Comparison}{17}{subsection.7.10}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Comparison of world model training approaches. Pure Dream achieves +74.3 in imagination but \textbf  {catastrophically fails} in real evaluation (-6.3), demonstrating dream exploitation. Hybrid and Dyna-style approaches produce more modest but consistent results. Model-free PPO remains the best performer (+38.74) because it observes structured game state directly.\relax }}{17}{figure.caption.19}\protected@file@percent }
+\newlabel{fig:wm-comparison}{{10}{17}{Comparison of world model training approaches. Pure Dream achieves +74.3 in imagination but \textbf {catastrophically fails} in real evaluation (-6.3), demonstrating dream exploitation. Hybrid and Dyna-style approaches produce more modest but consistent results. Model-free PPO remains the best performer (+38.74) because it observes structured game state directly.\relax }{figure.caption.19}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Learning curves for each world model approach. Left: Pure dream training shows rapid reward increase to +74 (in imagination). Center: Hybrid training converges to approximately -2.88 using real environment rewards. Right: Dyna-style periodic real evaluation shows consistent performance around -5 to -6.\relax }}{17}{figure.caption.20}\protected@file@percent }
+\newlabel{fig:wm-learning-curves}{{11}{17}{Learning curves for each world model approach. Left: Pure dream training shows rapid reward increase to +74 (in imagination). Center: Hybrid training converges to approximately -2.88 using real environment rewards. Right: Dyna-style periodic real evaluation shows consistent performance around -5 to -6.\relax }{figure.caption.20}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.11}Discussion: Why World Models Underperformed}{17}{subsection.7.11}\protected@file@percent }
+\citation{worldmodels}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Analysis of SAC Performance Failure}{18}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Action Space Mismatch}{18}{subsection.8.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Training Speed Penalty}{18}{subsection.8.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Entropy Regularization Interference}{18}{subsection.8.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.4}Episode Length Observations}{18}{subsection.8.4}\protected@file@percent }
 \bibstyle{plain}
-\bibcite{dqn}{1}
-\bibcite{ppo}{2}
-\bibcite{sac}{3}
-\bibcite{worldmodels}{4}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Challenges and Issues Encountered}{9}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {9}Conclusions and Next Steps}{9}{section.9}\protected@file@percent }
-\gdef \@abspage@last{9}
+\bibdata{refs}
+\bibcite{cobbe2019generalization}{1}
+\bibcite{garcia2015safe}{2}
+\bibcite{worldmodels}{3}
+\bibcite{dreamerv1}{4}
+\bibcite{dreamerv2}{5}
+\@writefile{toc}{\contentsline {section}{\numberline {9}Challenges and Issues Encountered}{19}{section.9}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {10}Conclusions and Next Steps}{19}{section.10}\protected@file@percent }
+\bibcite{dreamerv3}{6}
+\bibcite{juliani2018unity}{7}
+\bibcite{kempka2016vizdoom}{8}
+\bibcite{lample2017playing}{9}
+\bibcite{mnih2015dqn}{10}
+\bibcite{ng1999policy}{11}
+\bibcite{sutton1991dyna}{12}
+\bibcite{tobin2017domain}{13}
+\bibcite{coom}{14}
+\gdef \@abspage@last{20}

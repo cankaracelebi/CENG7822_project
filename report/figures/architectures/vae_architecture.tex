@@ -1,0 +1,230 @@
+
+\documentclass[border=8pt, multi, tikz]{standalone} 
+\usepackage{import}
+\subimport{/home/guava/Desktop/CENG7822_project/PlotNeuralNet/layers/}{init}
+\usetikzlibrary{positioning}
+\usetikzlibrary{3d} %for including external image 
+
+\def\ConvColor{rgb:yellow,5;red,2.5;white,5}
+\def\ConvReluColor{rgb:yellow,5;red,5;white,5}
+\def\PoolColor{rgb:red,1;black,0.3}
+\def\UnpoolColor{rgb:blue,2;green,1;black,0.3}
+\def\FcColor{rgb:blue,5;red,2.5;white,5}
+\def\FcReluColor{rgb:blue,5;red,5;white,4}
+\def\SoftmaxColor{rgb:magenta,5;black,7}   
+\def\SumColor{rgb:blue,5;green,15}
+
+\newcommand{\copymidarrow}{\tikz \draw[-Stealth,line width=0.8mm,draw={rgb:blue,4;red,1;green,1;black,3}] (-0.3,0) -- ++(0.3,0);}
+
+\begin{document}
+\begin{tikzpicture}
+\tikzstyle{connection}=[ultra thick,every node/.style={sloped,allow upside down},draw=\edgecolor,opacity=0.7]
+\tikzstyle{copyconnection}=[ultra thick,every node/.style={sloped,allow upside down},draw={rgb:blue,4;red,1;green,1;black,3},opacity=0.7]
+
+\pic[shift={(0,0,0)}] at (0,0,0) 
+    {Box={
+        name=input,
+        caption=64x64x3,
+        xlabel={{3, }},
+        zlabel=64,
+        fill={rgb:white,5;black,1},
+        height=32,
+        width=2,
+        depth=32
+        }
+    };
+
+\pic[shift={(2,0,0)}] at (input-east) 
+    {Box={
+        name=conv1,
+        caption=Conv1,
+        xlabel={{32, }},
+        zlabel=32,
+        fill=\ConvColor,
+        height=28,
+        width=2,
+        depth=28
+        }
+    };
+
+\draw [connection]  (input-east)    -- node {\midarrow} (conv1-west);
+
+\pic[shift={(1.5,0,0)}] at (conv1-east) 
+    {Box={
+        name=conv2,
+        caption=Conv2,
+        xlabel={{64, }},
+        zlabel=16,
+        fill=\ConvColor,
+        height=22,
+        width=3,
+        depth=22
+        }
+    };
+
+\draw [connection]  (conv1-east)    -- node {\midarrow} (conv2-west);
+
+\pic[shift={(1.5,0,0)}] at (conv2-east) 
+    {Box={
+        name=conv3,
+        caption=Conv3,
+        xlabel={{128, }},
+        zlabel=8,
+        fill=\ConvColor,
+        height=16,
+        width=4,
+        depth=16
+        }
+    };
+
+\draw [connection]  (conv2-east)    -- node {\midarrow} (conv3-west);
+
+\pic[shift={(1.5,0,0)}] at (conv3-east) 
+    {Box={
+        name=conv4,
+        caption=Conv4,
+        xlabel={{256, }},
+        zlabel=4,
+        fill=\ConvColor,
+        height=10,
+        width=5,
+        depth=10
+        }
+    };
+
+\draw [connection]  (conv3-east)    -- node {\midarrow} (conv4-west);
+
+\pic[shift={(2,0,0)}] at (conv4-east) 
+    {Box={
+        name=latent_params_mu,
+        caption=$\mu$,
+        xlabel={{ ,32}},
+        fill={rgb:red,4;white,3},
+        height=2,
+        width=1,
+        depth=8
+        }
+    };
+\pic[shift={(0,-1.5,0)}] at (latent_params_mu-south) 
+    {Box={
+        name=latent_params_sigma,
+        caption=$\sigma$,
+        xlabel={{ ,32}},
+        fill={rgb:blue,4;white,3},
+        height=2,
+        width=1,
+        depth=8
+        }
+    };
+
+\draw [connection]  (conv4-east)    -- node {\midarrow} (latent_params_mu-west);
+
+\draw [connection]  (conv4-east)    -- node {\midarrow} (latent_params_sigma-west);
+
+\pic[shift={(2.5,0,0)}] at (latent_params_mu-east) 
+    {Box={
+        name=z,
+        caption=z,
+        xlabel={{32, }},
+        fill={rgb:green,3;blue,2;white,3},
+        height=3,
+        width=1.5,
+        depth=10
+        }
+    };
+
+\draw [connection]  (latent_params_mu-east)    -- node {\midarrow} (z-west);
+
+\draw [connection]  (latent_params_sigma-east)    -- node {\midarrow} (z-west);
+
+\pic[shift={(2,0,0)}] at (z-east) 
+    {Box={
+        name=fc_dec,
+        caption=FC,
+        xlabel={{4096, }},
+        fill=\FcColor,
+        height=3,
+        width=1.5,
+        depth=10
+        }
+    };
+
+\draw [connection]  (z-east)    -- node {\midarrow} (fc_dec-west);
+
+\pic[shift={(1.5,0,0)}] at (fc_dec-east) 
+    {Box={
+        name=reshape,
+        caption=Reshape,
+        xlabel={{256, }},
+        zlabel=4,
+        fill=\ConvColor,
+        height=10,
+        width=5,
+        depth=10
+        }
+    };
+
+\draw [connection]  (fc_dec-east)    -- node {\midarrow} (reshape-west);
+
+\pic[shift={(1.5,0,0)}] at (reshape-east) 
+    {Box={
+        name=deconv1,
+        caption=DeConv1,
+        xlabel={{128, }},
+        zlabel=8,
+        fill=\UnpoolColor,
+        height=16,
+        width=4,
+        depth=16
+        }
+    };
+
+\draw [connection]  (reshape-east)    -- node {\midarrow} (deconv1-west);
+
+\pic[shift={(1.5,0,0)}] at (deconv1-east) 
+    {Box={
+        name=deconv2,
+        caption=DeConv2,
+        xlabel={{64, }},
+        zlabel=16,
+        fill=\UnpoolColor,
+        height=22,
+        width=3,
+        depth=22
+        }
+    };
+
+\draw [connection]  (deconv1-east)    -- node {\midarrow} (deconv2-west);
+
+\pic[shift={(1.5,0,0)}] at (deconv2-east) 
+    {Box={
+        name=deconv3,
+        caption=DeConv3,
+        xlabel={{32, }},
+        zlabel=32,
+        fill=\UnpoolColor,
+        height=28,
+        width=2,
+        depth=28
+        }
+    };
+
+\draw [connection]  (deconv2-east)    -- node {\midarrow} (deconv3-west);
+
+\pic[shift={(2,0,0)}] at (deconv3-east) 
+    {Box={
+        name=output,
+        caption=64x64x3,
+        xlabel={{3, }},
+        zlabel=64,
+        fill={rgb:white,5;black,1},
+        height=32,
+        width=2,
+        depth=32
+        }
+    };
+
+\draw [connection]  (deconv3-east)    -- node {\midarrow} (output-west);
+
+\end{tikzpicture}
+\end{document}

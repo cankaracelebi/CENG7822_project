@@ -142,8 +142,9 @@ class VAE(nn.Module):
             loss: Total loss
             metrics: Dict with individual loss components
         """
-        # Reconstruction loss (MSE)
-        recon_loss = F.mse_loss(recon, target, reduction='sum') / target.size(0)
+        # Reconstruction loss (BCE - per original World Models paper)
+        # Sigmoid output + BCE treats pixels as Bernoulli probabilities
+        recon_loss = F.binary_cross_entropy(recon, target, reduction='sum') / target.size(0)
         
         # KL divergence: -0.5 * sum(1 + log(σ²) - μ² - σ²)
         kl_loss = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp()) / target.size(0)
