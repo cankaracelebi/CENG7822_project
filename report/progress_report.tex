@@ -79,9 +79,10 @@ The Dreamer algorithm family \cite{dreamerv1, dreamerv2, dreamerv3} advanced wor
 
 \subsubsection{COOM: A Benchmark for Continual Reinforcement Learning}
 
-COOM (Continual DOOM) \cite{coom} represents an important recent benchmark for evaluating reinforcement learning agents in complex 3D environments. Presented at NeurIPS 2023 by Tomilin et al., COOM specifically targets \textit{continual reinforcement learning}--the ability of agents to learn new tasks sequentially while retaining knowledge of previously learned ones.
+COOM (Continual DOOM) \cite{coom} represents an important recent benchmark for evaluating reinforcement learning agents in complex 3D environments. Presented at NeurIPS 2023 by Tomilin et al., COOM specifically targets \textit{continual reinforcement learning}--the ability of agents to learn new tasks sequentially while retaining knowledge of previously learned ones.\\
 
-\textbf{Benchmark Design Philosophy:} Unlike traditional RL benchmarks that evaluate single-task performance, COOM assesses three crucial aspects of continual learning:
+\noindent
+\textbf{Benchmark Design :} Unlike traditional RL benchmarks that evaluate single-task performance, COOM assesses three crucial aspects of continual learning:
 \begin{enumerate}
     \item \textbf{Catastrophic Forgetting}: Does performance on earlier tasks degrade after learning new ones?
     \item \textbf{Knowledge Transfer}: Can learned skills accelerate acquisition of related tasks?
@@ -100,6 +101,7 @@ COOM (Continual DOOM) \cite{coom} represents an important recent benchmark for e
     \item \textbf{Health Gathering}: Survival through health kit collection
 \end{itemize}
 
+\noindent
 Each scenario offers default and hard difficulty variants, modifying agent speed, enemy count, or environmental complexity.
 
 \textbf{Task Sequence Types:} COOM formulates continual learning through two distinct sequence types:
@@ -157,6 +159,7 @@ Key findings from baseline evaluation:
     \item Visual complexity alone does not fully explain performance degradation
 \end{itemize}
 
+\noindent
 \textbf{Relevance to Our Work:} COOM's design principles directly inform our shooter environment and world model implementation:
 \begin{enumerate}
     \item \textbf{Multi-objective Nature}: Our environment requires agents to simultaneously optimize survival, collection, and combat--similar to how COOM scenarios test diverse skills.
@@ -192,9 +195,7 @@ The observation space is a normalized vector containing complete information abo
 
 \subsection{Action Space Design}
 
-The action space follows a multi-discrete structure with three independent components that the agent selects simultaneously at each timestep. The movement component offers five options: staying stationary or moving in one of the four cardinal directions. The shooting component is binary, determining whether the agent fires a projectile. The direction component specifies the aim direction from eight equally-spaced angles around the agent.
-
-This multi-discrete formulation creates 80 unique action combinations ($5 \times 2 \times 8 = 80$). Different RL algorithms handle this complexity differently: PPO can work directly with multi-discrete actions, DQN requires flattening to a single discrete space of 80 actions, and SAC requires a continuous action wrapper that maps box-constrained continuous values back to discrete choices.
+The action space follows a multi-discrete structure with three independent components that the agent selects simultaneously at each timestep. The movement component offers five options: staying stationary or moving in one of the four cardinal directions. The shooting component is binary, determining whether the agent fires a projectile. The direction component specifies the aim direction from eight equally-spaced angles around the agent. This multi-discrete formulation creates 80 unique action combinations ($5 \times 2 \times 8 = 80$). Different RL algorithms handle this complexity differently: PPO can work directly with multi-discrete actions, DQN requires flattening to a single discrete space of 80 actions, and SAC requires a continuous action wrapper that maps box-constrained continuous values back to discrete choices.
 
 \subsection{Reward Shaping Configurations}
 
@@ -219,17 +220,14 @@ Death Penalty ($R_{death}$) & $-$5.0 & $-$10.0 & $-$3.0 \\
 \end{tabular}
 \end{table}
 
-The \textbf{baseline} configuration represents a balanced approach with moderate rewards and penalties. The \textbf{survival} configuration heavily penalizes damage and death while offering smaller positive rewards, intended to train risk-averse agents that prioritize staying alive. The \textbf{aggressive} configuration maximizes positive rewards while minimizing penalties, encouraging agents to actively engage with the environment even at the cost of taking damage.
+\noindent
+The \textbf{baseline} configuration represents a balanced approach with moderate rewards and penalties. The survival configuration heavily penalizes damage and death while offering smaller positive rewards, intended to train risk-averse agents that prioritize staying alive. The aggressive configuration maximizes positive rewards while minimizing penalties, encouraging agents to actively engage with the environment even at the cost of taking damage.
 
 \section{Experimental Setup}
 
 \subsection{Algorithm Selection and Implementation}
 
-We evaluate three state-of-the-art reinforcement learning algorithms that represent different paradigms in the field. Our implementations leverage the Stable-Baselines3 library with custom wrappers for action space compatibility.
-
-\textbf{Deep Q-Network (DQN)} is an off-policy value-based method that maintains a replay buffer of past experiences and trains a neural network to estimate action values. DQN uses epsilon-greedy exploration, starting with high randomness and gradually transitioning to predominantly greedy action selection. For our multi-discrete action space, we flatten all 80 combinations into a single discrete space. DQN trains efficiently at approximately 800 frames per second on CPU.
-
-\textbf{Proximal Policy Optimization (PPO)} is an on-policy policy gradient method that directly optimizes the policy while preventing destructively large updates through a clipped surrogate objective. PPO naturally supports multi-discrete action spaces and demonstrates stable learning dynamics. We use 4 parallel environments for data collection, achieving approximately 1500 frames per second aggregate throughput.
+We evaluate three state-of-the-art reinforcement learning algorithms that represent different paradigms in the field. Our implementations leverage the Stable-Baselines3 library with custom wrappers for action space compatibility. Deep Q-Network (DQN) is an off-policy value-based method that maintains a replay buffer of past experiences and trains a neural network to estimate action values. DQN uses epsilon-greedy exploration, starting with high randomness and gradually transitioning to predominantly greedy action selection. For our multi-discrete action space, we flatten all 80 combinations into a single discrete space. DQN trains efficiently at approximately 800 frames per second on CPU. Proximal Policy Optimization (PPO) is an on-policy policy gradient method that directly optimizes the policy while preventing destructively large updates through a clipped surrogate objective. PPO naturally supports multi-discrete action spaces and demonstrates stable learning dynamics. We use 4 parallel environments for data collection, achieving approximately 1500 frames per second aggregate throughput.
 
 \textbf{Soft Actor-Critic (SAC)} is an off-policy actor-critic method that maximizes both reward and entropy, encouraging exploration through its maximum entropy framework. SAC requires continuous action spaces, so we wrap the environment to accept box-constrained continuous actions that are then discretized. Due to its sample-efficient but computationally intensive nature, SAC trains at approximately 65 frames per second, significantly slower than the alternatives.
 
@@ -241,9 +239,7 @@ To understand how learning progresses over time and whether additional training 
 
 \subsection{Learning Curve Analysis}
 
-The learning curves reveal distinct patterns for each algorithm and reward configuration combination. All figures show episode reward (y-axis) versus training timesteps (x-axis), with shaded regions indicating $\pm 1$ standard deviation across multiple evaluation runs.
-
-Figure~\ref{fig:dqn-curves} shows DQN's progression across the three reward configurations. Notably, DQN with survival rewards exhibits a \textbf{reward decrease} after initial improvement in the medium-duration training. This phenomenon occurs because the survival configuration's heavy death penalty ($-10.0$) creates a sparse reward landscape where the agent initially learns to avoid immediate death but subsequently struggles to accumulate positive rewards, leading to policy degradation as the agent becomes overly conservative.
+The learning curves reveal distinct patterns for each algorithm and reward configuration combination. All figures show episode reward (y-axis) versus training timesteps (x-axis), with shaded regions indicating $\pm 1$ standard deviation across multiple evaluation runs. Figure~\ref{fig:dqn-curves} shows DQN's progression across the three reward configurations. Notably, DQN with survival rewards exhibits a reward decrease after initial improvement in the medium-duration training. In my opinion, this phenomenon occurs because the survival configuration's heavy death penalty ($-10.0$) creates a sparse reward landscape where the agent initially learns to avoid immediate death but subsequently struggles to accumulate positive rewards, leading to policy degradation as the agent becomes overly conservative.
 
 \begin{figure}[H]
 \centering
@@ -252,6 +248,7 @@ Figure~\ref{fig:dqn-curves} shows DQN's progression across the three reward conf
 \label{fig:dqn-curves}
 \end{figure}
 
+\noindent
 PPO demonstrates the most stable learning behavior among the three algorithms, as shown in Figure~\ref{fig:ppo-curves}. The policy gradient updates produce smooth reward improvements without the oscillations sometimes observed in value-based methods. PPO with aggressive rewards and long training achieves our best observed performance of +38.74 mean reward.
 
 \begin{figure}[H]
@@ -261,6 +258,7 @@ PPO demonstrates the most stable learning behavior among the three algorithms, a
 \label{fig:ppo-curves}
 \end{figure}
 
+\noindent
 SAC's learning curves in Figure~\ref{fig:sac-curves} show more modest improvements compared to DQN and PPO. The entropy regularization may interfere with exploitation in our relatively simple environment, and the continuous-to-discrete action wrapper introduces additional complexity.
 
 \begin{figure}[H]
@@ -317,6 +315,7 @@ SAC & Survival & Medium & 2,229 & $-13.54 \pm 0.94$ \\
 \end{tabular}
 \end{table}
 
+\noindent
 \textbf{On High Standard Deviations:} The relatively high standard deviations observed (e.g., $\pm 30.61$ for PPO aggressive/long) deserve explanation. These reflect the inherent stochasticity of the game environment rather than training instability. Each episode involves random enemy spawns, prize locations, and combat outcomes. An agent might collect 5 prizes in a ``lucky'' episode or encounter difficult enemy configurations leading to early death. The aggressive reward configuration amplifies this variability because both positive rewards (+2.0 per prize) and negative events are magnified. Importantly, the \textit{mean} rewards are statistically significant--even with high variance, PPO aggressive/long ($+38.74$) clearly outperforms PPO survival/long ($-8.80$) beyond the overlap of their standard deviations.
 
 \section{Ablation Study: Effect of Reward Shaping (Engineering) }
@@ -332,17 +331,11 @@ Our ablation study reveals that reward shaping is the most influential factor in
 
 \subsection{Why Aggressive Rewards Work Best}
 
-The aggressive reward configuration's success can be attributed to several interconnected factors. First, the higher positive rewards for prize collection (+2.0 vs +1.0 baseline) and enemy kills (+2.0 vs +1.0) create stronger gradient signals that more effectively guide policy updates. The agent receives clear reinforcement for desirable behaviors, accelerating learning convergence.
-
-Second, the reduced death penalty ($-$3.0 vs $-$5.0 baseline) allows agents to learn from risky exploratory behaviors without catastrophically negative feedback. This encourages the agent to attempt challenging maneuvers that might occasionally result in death but ultimately lead to discovering more effective strategies.
-
-Third, the higher time penalty ($-$0.002 vs $-$0.001) discourages passive play, pushing agents toward active engagement with the environment rather than simply waiting and avoiding risk.
+The aggressive reward configuration's success can be attributed to several interconnected factors. First, the higher positive rewards for prize collection (+2.0 vs +1.0 baseline) and enemy kills (+2.0 vs +1.0) create stronger gradient signals that more effectively guide policy updates. The agent receives clear reinforcement for desirable behaviors, accelerating learning convergence. Second, the reduced death penalty ($-$3.0 vs $-$5.0 baseline) allows agents to learn from risky exploratory behaviors without catastrophically negative feedback. This encourages the agent to attempt challenging maneuvers that might occasionally result in death but ultimately lead to discovering more effective strategies. Third, the higher time penalty ($-$0.002 vs $-$0.001) discourages passive play, pushing agents toward active engagement with the environment rather than simply waiting and avoiding risk.
 
 \subsection{Why Survival Rewards Struggle}
 
-The survival configuration's poor performance across all algorithms highlights the limitations of penalty-dominated reward functions. The heavy death penalty ($-$10.0) creates a sparse reward landscape where avoiding death becomes the primary objective, but the path to survival offers little positive reinforcement. The reduced positive rewards (+0.5 for prizes and kills) fail to adequately guide learning toward constructive behaviors.
-
-Furthermore, the strong damage penalty ($-$3.0) makes any interaction with enemies extremely costly, training agents to avoid engagement entirely. While this produces agents that survive longer, they struggle to collect prizes or eliminate threats, resulting in persistent negative rewards from time penalties and eventual death.
+The survival configuration's poor performance across all algorithms highlights the limitations of penalty-dominated reward functions. The heavy death penalty ($-$10.0) creates a sparse reward landscape where avoiding death becomes the primary objective, but the path to survival offers little positive reinforcement. The reduced positive rewards (+0.5 for prizes and kills) fail to adequately guide learning toward constructive behaviors. Furthermore, the strong damage penalty ($-$3.0) makes any interaction with enemies extremely costly, training agents to avoid engagement entirely. While this produces agents that survive longer, they struggle to collect prizes or eliminate threats, resulting in persistent negative rewards from time penalties and eventual death.
 
 \subsection{DQN Reward Decrease Phenomenon}
 
@@ -379,16 +372,14 @@ Figure~\ref{fig:vae-arch} illustrates the complete VAE architecture, showing the
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{figures/architectures/vae_architecture.pdf}
-\caption{VAE Architecture. The encoder progressively reduces spatial dimensions through four convolutional layers (yellow) from $64\times64\times3$ to $4\times4\times256$, then projects to $\mu$ and $\sigma$ parameters (red/blue) for the 32-dimensional latent code $z$ (green). The decoder mirrors this structure using transposed convolutions (blue) to reconstruct the original image.}
+\caption{VAE Architecture. The encoder progressively reduces spatial dimensions through four convolutional layers from $64\times64\times3$ to $4\times4\times256$, then projects to $\mu$ and $\sigma$ parameters for the 32-dimensional latent code $z$ . The decoder mirrors this structure using transposed convolutions to reconstruct the original image.}
 \label{fig:vae-arch}
 \end{figure}
 
 \subsection{VAE Loss Function}
 \label{subsec:vae-loss}
 
-Following the original World Models paper \cite{worldmodels}, we employ Binary Cross-Entropy (BCE) for reconstruction, treating normalized pixel values as Bernoulli random variables. BCE outperformed Mean Squared Error (MSE) significantly: MSE reconstruction metrics dropped from 0.015 to under 0.001 with BCE. MSE fails for game frames because it encourages ``safe'' blurry predictions, while BCE creates sharp gradients that enforce confident pixel classification. The total VAE loss combines reconstruction with a KL divergence term ($\beta=1$) to regularize the latent distribution toward $\mathcal{N}(0, I)$.
-
-Figure~\ref{fig:vae-recon} demonstrates the final reconstruction quality achieved with BCE loss.
+Following the original World Models paper \cite{worldmodels}, we employ Binary Cross-Entropy (BCE) for reconstruction, treating normalized pixel values as Bernoulli random variables. BCE outperformed Mean Squared Error (MSE) significantly: MSE reconstruction metrics dropped from 0.015 to under 0.001 with BCE. MSE fails for game frames because it encourages ``safe'' blurry predictions, while BCE creates sharp gradients that enforce confident pixel classification. The total VAE loss combines reconstruction with a KL divergence term ($\beta=1$) to regularize the latent distribution toward $\mathcal{N}(0, I)$. Figure~\ref{fig:vae-recon} demonstrates the final reconstruction quality achieved with BCE loss.
 
 
 \subsection{MDN-RNN Dynamics Model}
@@ -397,9 +388,7 @@ The Mixture Density Network RNN (MDN-RNN) learns transition dynamics in latent s
 \begin{equation}
 P(z_{t+1}) = \sum_{k=1}^{K} \pi_k \cdot \mathcal{N}(z_{t+1} | \mu_k, \sigma_k)
 \end{equation}
-where $K=5$ mixture components. The LSTM hidden state $h_t$ captures temporal context. Additional heads predict reward and episode termination probability, enabling planning by rolling out action sequences entirely in imagination.
-
-Figure~\ref{fig:mdn-rnn-arch} illustrates the complete MDN-RNN architecture, showing how the current latent state $z_t$ and action $a_t$ are concatenated and processed through an LSTM to produce mixture density outputs and auxiliary predictions.
+where $K=5$ mixture components. The LSTM hidden state $h_t$ captures temporal context. Additional heads predict reward and episode termination probability, enabling planning by rolling out action sequences entirely in imagination. Figure~\ref{fig:mdn-rnn-arch} illustrates the complete MDN-RNN architecture, showing how the current latent state $z_t$ and action $a_t$ are concatenated and processed through an LSTM to produce mixture density outputs and auxiliary predictions.
 
 \begin{figure}[H]
 \centering
@@ -490,7 +479,7 @@ Figure~\ref{fig:wm-comparison} compares all world model training approaches agai
 
 \subsection{Discussion: Why World Models Underperformed}
 
-Our world model experiments revealed fundamental challenges when applying imagination-based training to environments with available structured state:
+Our world model experiments revealed fundamental challenges when applying imagination-based training to environments with available structured state:\\
 
 \textbf{1. Information Bottleneck:} The VAE compresses $64 \times 64 \times 3$ images to a 32-dimensional latent code. While reconstructions appear visually accurate, precise numerical information (exact positions, health values) is lost. Model-free agents observe structured 32-dimensional state with exact values.
 
@@ -525,12 +514,15 @@ Table~\ref{tab:results} shows that SAC completed significantly more episodes (7,
 
 \section{Challenges and Issues Encountered}
 
-Throughout this project, we encountered several technical challenges that required careful engineering solutions.
+Throughout this project, we encountered several technical challenges that required careful engineering solutions.\\
 
+\noindent
 \textbf{Action Space Incompatibility}: The multi-discrete action space posed compatibility issues with algorithms designed for discrete (DQN) or continuous (SAC) spaces. We implemented custom wrappers that flatten multi-discrete to discrete for DQN and convert continuous box actions back to discrete choices for SAC.
 
+\noindent
 \textbf{SAC Training Speed}: SAC's off-policy nature with continuous action processing resulted in approximately 12x slower training compared to DQN and PPO. This limited the practical number of experiments we could run with SAC and may contribute to its underperformance.
 
+\noindent
 \textbf{RGB Rendering for World Model}: The arcade-based game environment required custom implementation for rendering to numpy arrays suitable for neural network training, as the default rendering pipeline was designed for display rather than data collection.
 
 \section{Conclusions}
